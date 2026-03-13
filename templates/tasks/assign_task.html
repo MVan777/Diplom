@@ -1,0 +1,158 @@
+{% extends 'app_base.html' %}
+{% load static %}
+
+{% block title %}Назначить задачу{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        max-width: 600px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        border-bottom: 2px solid #f0f0f0;
+        padding-bottom: 1rem;
+    }
+
+    .form-header h1 {
+        margin: 0;
+        color: #333;
+    }
+
+    .task-info {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+        border-left: 4px solid #4a6cf7;
+    }
+
+    .task-info h3 {
+        margin: 0 0 0.5rem 0;
+        color: #333;
+    }
+
+    .task-info p {
+        margin: 0.25rem 0;
+        color: #666;
+        font-size: 0.95rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #555;
+        font-weight: 600;
+    }
+
+    input[type="text"],
+    input[type="datetime-local"] {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-family: inherit;
+        transition: border-color 0.3s ease;
+        box-sizing: border-box;
+    }
+
+    input:focus {
+        outline: none;
+        border-color: #4a6cf7;
+        box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.1);
+    }
+
+    .hint {
+        color: #999;
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #4a6cf7 0%, #2563eb 100%);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(74, 108, 247, 0.4);
+    }
+
+    .btn-secondary {
+        background: #e0e0e0;
+        color: #333;
+    }
+
+    .btn-secondary:hover {
+        background: #d0d0d0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="form-header">
+        <h1><i class="fas fa-user-check"></i> Назначить задачу</h1>
+    </div>
+
+    <div class="task-info">
+        <h3>{{ task.title }}</h3>
+        <p><strong>Приоритет:</strong> {{ task.get_priority_display }}</p>
+        <p><strong>Дедлайн:</strong> {{ task.deadline|date:"j E Y г. H:i" }}</p>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="username">Имя пользователя *</label>
+            <input type="text" id="username" name="username" placeholder="Введите имя пользователя" required>
+            <div class="hint">Введите точное имя пользователя для поиска</div>
+        </div>
+
+        <div class="form-group">
+            <label for="deadline">Срок выполнения (опционально)</label>
+            <input type="datetime-local" id="deadline" name="deadline" value="{{ task.deadline|date:'Y-m-dTH:i' }}">
+            <div class="hint">Если не указать, будет использован дедлайн задачи</div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-check"></i> Назначить
+            </button>
+            <a href="{% url 'tasks:task_detail' task.pk %}" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Отмена
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

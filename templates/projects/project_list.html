@@ -1,0 +1,199 @@
+{% extends 'app_base.html' %}
+{% load static %}
+
+{% block title %}Проекты{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+<link rel="stylesheet" href="{% static 'css/projects.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="projects-layout">
+    <!-- Заголовок и статистика -->
+    <div class="projects-header">
+        <div class="projects-header__title">
+            <h1>
+                <i class="fas fa-folder"></i>
+                Проекты
+            </h1>
+            {% if owned_projects or member_projects %}
+            <div class="projects-header__stats">
+                <div class="header-stat">
+                    <span class="header-stat__value">{{ total_projects }}</span>
+                    <span class="header-stat__label">всего</span>
+                </div>
+                <div class="header-stat">
+                    <span class="header-stat__value">{{ owned_projects|length }}</span>
+                    <span class="header-stat__label">моих</span>
+                </div>
+                <div class="header-stat">
+                    <span class="header-stat__value">{{ member_projects|length }}</span>
+                    <span class="header-stat__label">участие</span>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        <a href="{% url 'projects:create' %}" class="btn project-btn--primary btn--with-icon">
+            <i class="fas fa-plus"></i>
+            Новый проект
+        </a>
+    </div>
+
+    <!-- Если нет проектов -->
+    {% if not owned_projects and not member_projects %}
+    <div class="empty-state">
+        <div class="empty-state__icon">
+            <i class="fas fa-folder-open"></i>
+        </div>
+        <h2 class="empty-state__title">Проектов нет</h2>
+        <p class="empty-state__message">
+            Создайте свой первый проект или дождитесь приглашения в существующий
+        </p>
+        <a href="{% url 'projects:create' %}" class="btn project-btn--primary btn--large">
+            <i class="fas fa-plus"></i>
+            Создать проект
+        </a>
+    </div>
+    {% else %}
+
+    <!-- Мои проекты (как владелец) -->
+    <!-- Мои проекты (как владелец) -->
+{% if owned_projects %}
+<section class="projects-section">
+    <div class="projects-section__header">
+        <h2 class="projects-section__title">
+            <i class="fas fa-crown"></i>
+            Мои проекты
+        </h2>
+        <span class="projects-section__count">{{ owned_projects|length }}</span>
+    </div>
+
+    <div class="projects-grid">
+        {% for project in owned_projects %}
+        <div class="project-card project-card--owner">
+            <div class="project-card__header">
+                <h3 class="project-card__title">
+                    <a href="{% url 'projects:detail' project.id %}">{{ project.name }}</a>
+                </h3>
+                <div class="project-card__badge">
+                    <i class="fas fa-crown"></i>
+                    Владелец
+                </div>
+            </div>
+
+            <div class="project-card__description">
+                {% if project.description %}
+                    {{ project.description|truncatechars:100 }}
+                {% else %}
+                    <span class="project-card__description--empty">Нет описания</span>
+                {% endif %}
+            </div>
+
+            <div class="project-card__stats">
+                <div class="project-stat">
+                    <i class="fas fa-tasks project-stat__icon"></i>
+                    <div class="project-stat__content">
+                        <span class="project-stat__value">{{ project.project_tasks.count }}</span>
+                        <span class="project-stat__label">задач</span>
+                    </div>
+                </div>
+                <div class="project-stat">
+                    <i class="fas fa-users project-stat__icon"></i>
+                    <div class="project-stat__content">
+                        <span class="project-stat__value">{{ project.members.count }}</span>
+                        <span class="project-stat__label">участников</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Прогресс выполнения -->
+            {% if project.total_tasks > 0 %}
+                <div class="project-card__progress">
+                    <div class="progress-bar">
+                        <div class="progress-bar__fill" style="width: {% widthratio project.completed_tasks project.total_tasks 100 %}%"></div>
+                    </div>
+                    <span class="progress-bar__text">{{ project.completed_tasks }}/{{ project.total_tasks }} выполнено</span>
+                </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+
+    </div>
+</section>
+{% endif %}
+
+    <!-- Проекты где я участник -->
+    {% if member_projects %}
+    <section class="projects-section">
+        <div class="projects-section__header">
+            <h2 class="projects-section__title">
+                <i class="fas fa-handshake"></i>
+                Участвую в проектах
+            </h2>
+            <span class="projects-section__count">{{ member_projects|length }}</span>
+        </div>
+
+        <div class="projects-grid">
+            <!-- ❗ ИСПРАВЛЕНО: меняем owned_projects на member_projects -->
+            {% for project in member_projects %}
+            <div class="project-card project-card--member">
+                <div class="project-card__header">
+                    <h3 class="project-card__title">
+                        <a href="{% url 'projects:detail' project.id %}">{{ project.name }}</a>
+                    </h3>
+                    <div class="project-card__owner">
+                        <i class="fas fa-user"></i>
+                        {{ project.owner.username }}
+                    </div>
+                </div>
+
+                <div class="project-card__description">
+                    {% if project.description %}
+                        {{ project.description|truncatechars:100 }}
+                    {% else %}
+                        <span class="project-card__description--empty">Нет описания</span>
+                    {% endif %}
+                </div>
+
+                <div class="project-card__stats">
+                    <div class="project-stat">
+                        <i class="fas fa-tasks project-stat__icon"></i>
+                        <div class="project-stat__content">
+                            <span class="project-stat__value">{{ project.project_tasks.count }}</span>
+                            <span class="project-stat__label">задач</span>
+                        </div>
+                    </div>
+
+                    <div class="project-stat">
+                        <i class="fas fa-users project-stat__icon"></i>
+                        <div class="project-stat__content">
+                            <span class="project-stat__value">{{ project.members.count }}</span>
+                            <span class="project-stat__label">участников</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Прогресс выполнения для проектов-участия -->
+                    {% if project.total_tasks > 0 %}
+                        <div class="project-card__progress">
+                            <div class="progress-bar">
+                                <div class="progress-bar__fill" style="width: {% widthratio project.completed_tasks project.total_tasks 100 %}%"></div>
+                            </div>
+                            <span class="progress-bar__text">{{ project.completed_tasks }}/{{ project.total_tasks }} выполнено</span>
+                        </div>
+                    {% endif %}
+
+                <!-- Роль в проекте -->
+                <div class="project-card__footer">
+                    <span class="project-card__role">Участник</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    {% endif %} <!-- Закрываем else для пустых проектов -->
+</div> <!-- Закрываем projects-layout -->
+{% endblock %}

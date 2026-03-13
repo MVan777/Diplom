@@ -1,0 +1,35 @@
+{% extends 'app_base.html' %}
+{% load static %}
+
+{% block title %}Редактировать проект{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="form-header">
+        <h1><i class="fas fa-edit"></i> Редактировать проект</h1>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="name">Название проекта *</label>
+            <input type="text" id="name" name="name" placeholder="Введите название проекта" value="{{ project.name }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Описание</label>
+            <textarea id="description" name="description" placeholder="Опишите суть проекта...">{{ project.description }}</textarea>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Сохранить
+            </button>
+            <a href="{% url 'projects:detail' project.id %}" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Отмена
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

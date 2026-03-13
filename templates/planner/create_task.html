@@ -1,0 +1,176 @@
+{% extends 'app_base.html' %}
+{% load static %}
+
+{% block title %}Создать задачу{% endblock %}
+
+{% block extra_css %}
+<style>
+    .project-badge {
+        background: var(--primary);
+        color: white;
+        padding: 8px 15px;
+        border-radius: var(--radius);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 20px;
+    }
+    .project-badge i {
+        font-size: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="form-header">
+        <h1><i class="fas fa-plus-circle"></i> Создать новую задачу</h1>
+    </div>
+
+    <!-- Информация о проекте, если задача создается в проекте -->
+    {% if selected_project %}
+    <div class="project-badge">
+        <i class="fas fa-folder"></i>
+        Создание задачи в проекте: <strong>{{ selected_project.name }}</strong>
+        <input type="hidden" name="project" value="{{ selected_project.id }}" form="taskForm">
+    </div>
+    {% endif %}
+
+    <!-- Форма для одной задачи -->
+    <form method="post" class="task-form" id="taskForm">
+        {% csrf_token %}
+
+        <div class="form-group">
+            {{ form.title.label_tag }}
+            {{ form.title }}
+            {% if form.title.errors %}
+                <div class="error-message">{{ form.title.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            {{ form.description.label_tag }}
+            {{ form.description }}
+            {% if form.description.errors %}
+                <div class="error-message">{{ form.description.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                {{ form.priority.label_tag }}
+                {{ form.priority }}
+                {% if form.priority.errors %}
+                    <div class="error-message">{{ form.priority.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form.deadline.label_tag }}
+                {{ form.deadline }}
+                {% if form.deadline.errors %}
+                    <div class="error-message">{{ form.deadline.errors }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Поле выбора проекта (только если не передан project в GET) -->
+        {% if not selected_project %}
+        <div class="form-group">
+            {{ form.project.label_tag }}
+            {{ form.project }}
+            {% if form.project.errors %}
+                <div class="error-message">{{ form.project.errors }}</div>
+            {% endif %}
+            <small class="hint">Выберите проект для задачи (необязательно)</small>
+        </div>
+        {% endif %}
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-check"></i> Создать задачу
+            </button>
+            <a href="{% if selected_project %}{% url 'projects:detail' selected_project.id %}{% else %}{% url 'tasks:planner' %}{% endif %}" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Отмена
+            </a>
+        </div>
+    </form>
+
+    <!-- Форма для нескольких задач (опционально) -->
+    <hr style="margin: 30px 0;">
+
+    <div class="form-header">
+        <h2><i class="fas fa-layer-group"></i> Или создайте несколько задач</h2>
+    </div>
+
+    <form method="post" action="{% url 'tasks:create_task' %}" id="multipleTaskForm">
+        {% csrf_token %}
+
+        {% if selected_project %}
+        <input type="hidden" name="project" value="{{ selected_project.id }}">
+        {% endif %}
+
+        <div id="tasksContainer">
+            <div class="task-item-form">
+                <div class="form-group">
+                    <label>Название задачи *</label>
+                    <input type="text" name="titles[]" class="form-input" placeholder="Название задачи" required>
+                </div>
+                <div class="form-group">
+                    <label>Срок выполнения *</label>
+                    <input type="datetime-local" name="deadlines[]" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label>Приоритет</label>
+                    <select name="priorities[]" class="form-select">
+                        <option value="ordinary">🟢 Обычный</option>
+                        <option value="average" selected>🟡 Средний</option>
+                        <option value="urgent">🔴 Срочный</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <button type="button" class="btn btn-secondary" id="addAnotherTaskBtn" style="width: 100%; margin-bottom: 15px;">
+            <i class="fas fa-plus"></i> Добавить еще задачу
+        </button>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Создать все задачи
+            </button>
+            <a href="{% if selected_project %}{% url 'projects:detail' selected_project.id %}{% else %}{% url 'tasks:planner' %}{% endif %}" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Отмена
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Кнопка добавления новой задачи в множественной форме
+    const addBtn = document.getElementById('addAnotherTaskBtn');
+    const container = document.getElementById('tasksContainer');
+
+    if (addBtn && container) {
+        addBtn.addEventListener('click', function() {
+            const firstItem = container.querySelector('.task-item-form');
+            const newItem = firstItem.cloneNode(true);
+
+            // Очищаем значения
+            newItem.querySelectorAll('input, select').forEach(field => {
+                if (field.type === 'datetime-local') {
+                    field.value = '';
+                } else if (field.type === 'text') {
+                    field.value = '';
+                } else if (field.tagName === 'SELECT') {
+                    field.value = 'average';
+                }
+            });
+
+            container.appendChild(newItem);
+        });
+    }
+});
+</script>
+{% endblock %}

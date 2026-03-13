@@ -1,0 +1,279 @@
+{% extends 'app_base.html' %}
+{% load static %}
+
+{% block title %}{{ project.name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+{% endblock %}
+
+{% block content %}
+<div class="project-detail-layout">
+    <!-- Шапка проекта с градиентом -->
+    <div class="project-hero">
+        <div class="project-hero__content">
+            <div class="project-hero__header">
+                <h1 class="project-hero__title">{{ project.name }}</h1>
+                {% if is_owner %}
+                <div class="project-hero__badge">
+                    <i class="fas fa-crown"></i> Владелец
+                </div>
+                {% endif %}
+            </div>
+            <p class="project-hero__description">{{ project.description|default:"Нет описания" }}</p>
+            <div class="project-hero__meta">
+                <span><i class="fas fa-calendar-alt"></i> Создан: {{ project.created_at|date:"j E Y г." }}</span>
+                <span><i class="fas fa-user"></i> Владелец: {{ project.owner.username }}</span>
+            </div>
+        </div>
+
+        {% if is_owner %}
+        <div class="project-hero__actions">
+            <a href="{% url 'projects:edit' project.id %}" class="hero-btn hero-btn--edit">
+                <i class="fas fa-edit"></i> Редактировать
+            </a>
+            <a href="{% url 'projects:delete' project.id %}" class="hero-btn hero-btn--delete">
+                <i class="fas fa-trash"></i> Удалить
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Статистика плитками -->
+    <div class="stats-grid">
+        <div class="project-stat-card project-stat-card--tasks">
+            <div class="task-stat-card__icon">
+                <i class="fas fa-tasks"></i>
+            </div>
+            <div class="project-stat-card__content">
+                <div class="project-stat-card__value">{{ tasks|length }}</div>
+                <div class="project-stat-card__label">Всего задач</div>
+            </div>
+        </div>
+
+        <div class="project-stat-card stat-card--completed">
+            <div class="task-stat-card__icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="task-stat-card__content">
+                <div class="project-stat-card__value">{{ completed_tasks|default:"0" }}</div>
+                <div class="task-stat-card__label">Выполнено</div>
+            </div>
+        </div>
+
+        <div class="project-stat-card stat-card--members">
+            <div class="task-stat-card__icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="task-stat-card__content">
+                <div class="task-stat-card__value">{{ project.members.count }}</div>
+                <div class="task-stat-card__label">Участников</div>
+            </div>
+        </div>
+
+        <div class="project-stat-card stat-card--progress">
+            <div class="task-stat-card__icon">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="task-stat-card__content">
+                <div class="task-stat-card__value">
+                    {% if tasks|length > 0 %}
+                        {% widthratio completed_tasks|default:"0" tasks|length 100 %}%
+                    {% else %}
+                        0%
+                    {% endif %}
+                </div>
+                <div class="task-stat-card__label">Прогресс</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Основной контент: две колонки -->
+    <div class="content-grid">
+        <!-- Левая колонка: Задачи -->
+        <div class="content-grid__main">
+            <div class="section-card">
+                <div class="section-card__header">
+                    <h2 class="section-card__title">
+                        <i class="fas fa-tasks"></i>
+                        Задачи проекта
+                    </h2>
+                    <a href="{% url 'tasks:create_task' %}?project={{ project.id }}" class="btn btn--primary btn--with-icon">
+                        <i class="fas fa-plus"></i>
+                        Добавить задачу
+                    </a>
+                </div>
+
+                {% if project.project_tasks.all %}
+                    <div class="tasks-list">
+                        {% for task in project.project_tasks.all %}
+                        <div class="task-card {% if task.is_completed %}task-card--completed{% endif %}">
+                            <div class="task-card__content">
+                                <div class="task-card__header">
+                                    <h3 class="task-card__title">
+                                        <a href="{% url 'tasks:task_detail' task.id %}">{{ task.title }}</a>
+                                    </h3>
+                                    <div class="task-card__priority priority-{{ task.priority }}">
+                                        {% if task.priority == 'urgent' %}
+                                            🔴 Срочный
+                                        {% elif task.priority == 'average' %}
+                                            🟡 Средний
+                                        {% else %}
+                                            🟢 Обычный
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                {% if task.description %}
+                                <p class="task-card__description">{{ task.description|truncatechars:100 }}</p>
+                                {% endif %}
+
+                                <div class="task-card__meta">
+                                    <div class="task-card__deadline">
+                                        <i class="fas fa-clock"></i>
+                                        {{ task.deadline|date:"d.m.Y H:i" }}
+                                    </div>
+                                    <div class="task-card__status status-{% if task.is_completed %}completed{% else %}active{% endif %}">
+                                        {% if task.is_completed %}
+                                            ✓ Выполнено
+                                        {% else %}
+                                            ⟳ В работе
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="task-card__actions">
+                                <a href="{% url 'tasks:edit_task' task.id %}" class="task-action task-action--edit" title="Редактировать">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form method="post" action="{% url 'tasks:complete_task' task.id %}" style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="task-action task-action--complete" title="Выполнить">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </form>
+                                <form method="post" action="{% url 'tasks:delete_task' task.id %}" style="display: inline;" onsubmit="return confirm('Удалить задачу?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="task-action task-action--delete" title="Удалить">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <div class="empty-state__icon">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <h3 class="empty-state__title">Задач пока нет</h3>
+                        <p class="empty-state__message">Создайте первую задачу в проекте</p>
+                        <a href="{% url 'tasks:create_task' %}?project={{ project.id }}" class="btn btn--primary btn--with-icon">
+                            <i class="fas fa-plus"></i>
+                            Создать задачу
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Правая колонка: Участники и действия -->
+        <div class="content-grid__sidebar">
+            <!-- Участники -->
+            <div class="sidebar-card">
+                <div class="sidebar-card__header">
+                    <h3 class="sidebar-card__title">
+                        <i class="fas fa-users"></i>
+                        Участники
+                    </h3>
+                    <span class="sidebar-card__badge">{{ project.members.count }}</span>
+                </div>
+
+                <div class="members-list">
+                    {% for member in members %}
+                    <div class="member-item">
+                        <div class="member-item__info">
+                            <i class="fas fa-user-circle member-item__avatar"></i>
+                            <span class="member-item__name">{{ member.username }}</span>
+                        </div>
+                        {% if is_owner and member != request.user %}
+                        <a href="{% url 'projects:remove_member' project.id member.id %}" class="member-item__remove" title="Удалить участника">
+                            <i class="fas fa-times"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+
+                {% if is_owner %}
+                <a href="{% url 'projects:add_member' project.id %}" class="btn btn--secondary btn--full-width btn--with-icon" style="margin-top: 15px;">
+                    <i class="fas fa-user-plus"></i>
+                    Добавить участника
+                </a>
+                {% endif %}
+            </div>
+
+            <!-- Действия -->
+            <div class="sidebar-card">
+                <div class="sidebar-card__header">
+                    <h3 class="sidebar-card__title">
+                        <i class="fas fa-cog"></i>
+                        Действия
+                    </h3>
+                </div>
+
+                <div class="action-list">
+                    <a href="{% url 'projects:chat' project.id %}" class="action-item">
+                        <div class="action-item__icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div class="action-item__content">
+                            <div class="action-item__title">Чат проекта</div>
+                            <div class="action-item__subtitle">Обсуждение и комментарии</div>
+                        </div>
+                        <i class="fas fa-chevron-right action-item__arrow"></i>
+                    </a>
+
+                    <a href="{% url 'projects:list' %}" class="action-item">
+                        <div class="action-item__icon">
+                            <i class="fas fa-arrow-left"></i>
+                        </div>
+                        <div class="action-item__content">
+                            <div class="action-item__title">К списку проектов</div>
+                            <div class="action-item__subtitle">Вернуться назад</div>
+                        </div>
+                        <i class="fas fa-chevron-right action-item__arrow"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Информация -->
+            <div class="sidebar-card">
+                <div class="sidebar-card__header">
+                    <h3 class="sidebar-card__title">
+                        <i class="fas fa-info-circle"></i>
+                        Информация
+                    </h3>
+                </div>
+
+                                <div class="info-list">
+                    <div class="info-item">
+                        <span class="info-item__label">Владелец:</span>
+                        <span class="info-item__value">{{ project.owner.username }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-item__label">Создан:</span>
+                        <span class="info-item__value">{{ project.created_at|date:"d.m.Y" }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-item__label">Обновлен:</span>
+                        <span class="info-item__value">{{ project.updated_at|date:"d.m.Y" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

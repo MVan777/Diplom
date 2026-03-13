@@ -1,0 +1,72 @@
+📤 ВЫГРУЗКА НОВОГО ПРОЕКТА НА GITHUB
+
+git --version
+
+git clone https://github.com/MVan777/planner_777.git
+cd planner_777
+
+1. Подготовка проекта:
+
+# В папке проекта
+echo ".venv/" > .gitignore
+echo "db.sqlite3" >> .gitignore
+pip freeze > requirements.txt
+2. Загрузить на GitHub:
+
+
+git init
+git add .
+git commit -m "First commit"
+# На GitHub создай новый репозиторий (без README)
+git remote add origin https://github.com/ТВОЙ_ЛОГИН/НАЗВАНИЕ.git
+git push -u origin main
+📥 ПОЛУЧЕНИЕ ПРОЕКТА НА ДРУГОМ ПК
+В первый раз:
+
+git clone https://github.com/ТВОЙ_ЛОГИН/НАЗВАНИЕ.git
+cd НАЗВАНИЕ
+python -m venv .venv
+.venv\Scripts\activate      # Windows
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver
+Уже есть проект - просто обнови:
+
+cd НАЗВАНИЕ
+git pull origin main
+🔄 ЕЖЕДНЕВНАЯ РАБОТА
+На любом ПК:
+
+# 1. Получить свежее
+git pull origin main
+
+# 2. Работать...
+
+# 3. Сохранить и отправить
+git add .
+git commit -m "Что сделал"
+git push origin main
+🎯 4 ГЛАВНЫЕ КОМАНДЫ:
+
+git pull   # Скачать изменения
+git add .  # Подготовить файлы
+git commit # Сохранить локально
+git push   # Отправить на GitHub
+🔑 ДЛЯ УДОБСТВА (1 РАЗ НАСТРОИТЬ):
+
+# SSH ключи (чтобы не вводить пароль)
+ssh-keygen -t rsa -b 4096
+# Скопируй из: cat ~/.ssh/id_rsa.pub
+# Добавь на GitHub: Settings → SSH keys
+# Клонируй так: git clone git@github.com:...
+⚠️ ЕСЛИ ЧТО-ТО ПОШЛО НЕ ТАК:
+
+# Отменить последний коммит (сохранив изменения)
+git reset --soft HEAD~1
+
+# Вернуть удаленный файл
+git checkout -- имя_файла.py
+
+# Скачать принудительно с сервера
+git fetch origin
+git reset --hard origin/main

@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Отменить назначение{% endblock %}
+
+{% block extra_css %}
+<style>
+    .confirm-container {
+        max-width: 500px;
+        margin: 3rem auto;
+        padding: 2rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        border: 3px solid #f39c12;
+    }
+
+    .confirm-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .confirm-icon {
+        font-size: 3rem;
+        color: #f39c12;
+        margin-bottom: 1rem;
+    }
+
+    .confirm-header h1 {
+        color: #f39c12;
+        margin: 0 0 0.5rem 0;
+        font-size: 1.8rem;
+    }
+
+    .confirm-message {
+        background: #f5f5f5;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid #f39c12;
+    }
+
+    .details {
+        background: #fff3cd;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid #f39c12;
+    }
+
+    .details p {
+        margin: 0.5rem 0;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+    }
+
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        flex: 1;
+    }
+
+    .btn-warning {
+        background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+        color: white;
+    }
+
+    .btn-warning:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(243, 156, 18, 0.4);
+    }
+
+    .btn-secondary {
+        background: #e0e0e0;
+        color: #333;
+    }
+
+    .btn-secondary:hover {
+        background: #d0d0d0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="confirm-container">
+    <div class="confirm-header">
+        <div class="confirm-icon">
+            <i class="fas fa-times-circle"></i>
+        </div>
+        <h1>Отменить назначение</h1>
+    </div>
+
+    <div class="confirm-message">
+        <p><strong>Вы собираетесь отменить назначение задачи.</strong> Пользователь больше не будет работать над этой задачей.</p>
+    </div>
+
+    <div class="details">
+        <p><strong>Задача:</strong> {{ assignment.task.title }}</p>
+        <p><strong>Исполнитель:</strong> {{ assignment.user.username }}</p>
+        <p><strong>Статус:</strong> {{ assignment.get_status_display }}</p>
+    </div>
+
+    <div class="button-group">
+        <form method="post" style="flex: 1;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-warning" style="width: 100%;">
+                <i class="fas fa-trash"></i> Отменить назначение
+            </button>
+        </form>
+        <a href="{% url 'tasks:task_detail' assignment.task.pk %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Отмена
+        </a>
+    </div>
+</div>
+{% endblock %}

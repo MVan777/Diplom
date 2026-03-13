@@ -1,0 +1,202 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0; /* ДОБАВИЛ: сброс марджинов */
+    padding: 20px; /* ДОБАВИЛ: отступ для мобильных */
+    box-sizing: border-box; /* ДОБАВИЛ: правильный расчет размеров */
+}
+
+.login-container {
+    background: white;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    box-sizing: border-box; /* ДОБАВИЛ: учитывает padding в ширине */
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.login-header h1 {
+    color: #333;
+    font-size: 28px;
+    font-weight: 600;
+    margin: 0; /* ДОБАВИЛ: сброс марджинов */
+}
+
+.login-header p {
+    color: #666;
+    margin-top: 10px;
+    margin-bottom: 0; /* ДОБАВИЛ: сброс марджинов */
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: 500;
+}
+
+/* ИСПРАВИЛ: Добавил box-sizing чтобы padding и border входили в 100% */
+.form-group:not(.form-group-number) input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #aaaaaa;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box; /* РЕШЕНИЕ: padding и border внутри 100% */
+}
+
+.form-group:not(.form-group-number) input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.form-group-number {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid #aaaa;
+    border-radius: 8px;
+    padding: 5px;
+    background: white;
+    box-sizing: border-box; /* ДОБАВИЛ: правильный расчет */
+}
+
+.form-group-number select {
+    width: 120px;
+    border: none;
+    background: none;
+    padding: 10px;
+    outline: none;
+    box-sizing: border-box; /* ДОБАВИЛ: правильный расчет */
+}
+
+.form-group-number input {
+    flex: 1;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 0;
+    font-size: 10px;
+    outline: none;
+    background: transparent;
+    box-sizing: border-box; /* ДОБАВИЛ: правильный расчет */
+    min-width: 0; /* ДОБАВИЛ: разрешает сжатие в flex */
+}
+
+.remember-forgot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+}
+
+.remember-me input {
+    margin-right: 8px;
+}
+
+.forgot-password {
+    color: #667eea;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.forgot-password:hover {
+    text-decoration: underline;
+}
+
+.login-button {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    box-sizing: border-box; /* ДОБАВИЛ: правильный расчет */
+}
+
+.login-button:hover {
+    transform: translateY(-2px);
+}
+
+.signup-link {
+    text-align: center;
+    margin-top: 25px;
+    color: #666;
+}
+
+.signup-link a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.signup-link a:hover {
+    text-decoration: underline;
+}
+
+.social-login {
+    margin-top: 25px;
+    text-align: center;
+}
+
+.social-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.social-button {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid #e1e1e1;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-sizing: border-box; /* ДОБАВИЛ: правильный расчет */
+}
+
+.social-button:hover {
+    border-color: #667eea;
+    transform: translateY(-1px);
+}
+
+@media (max-width: 480px) {
+    .login-container {
+        margin: 0; /* ИЗМЕНИЛ: убрал margin */
+        padding: 25px 20px; /* ИЗМЕНИЛ: уменьшил padding */
+    }
+
+    .remember-forgot {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+
+    body {
+        padding: 10px; /* ДОБАВИЛ: уменьшил отступ для мобильных */
+    }
+}

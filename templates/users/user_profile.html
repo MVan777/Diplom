@@ -1,0 +1,117 @@
+{% extends 'app_base.html' %}
+{% load static %}
+
+{% block extra_css %}
+{% endblock %}
+
+{% block content %}
+<body>
+<div class="profile-wrapper">
+    <a href="{% url 'tasks:planner' %}" class="back-btn">
+        <i class="fas fa-arrow-left"></i> Вернуться к задачам
+    </a>
+
+    <div class="profile-container">
+        <div class="profile-header">
+            <div class="profile-avatar">
+                {% if profile.avatar %}
+                    <img src="{{ profile.avatar.url }}" alt="Аватар {{ user.username }}">
+                {% else %}
+                    <div class="avatar-placeholder">
+                        {{ user.username|first|upper }}
+                    </div>
+                {% endif %}
+            </div>
+            <h1>{{ user.get_full_name|default:user.username }}</h1>
+            <p>@{{ user.username }}</p>
+            {% if user.email %}
+                <p><i class="fas fa-envelope"></i> {{ user.email }}</p>
+            {% endif %}
+        </div>
+
+        {% if tasks_count > 0 %}
+        <div class="profile-stats">
+            <div class="stat-card">
+                <h3>{{ tasks_count }}</h3>
+                <p><i class="fas fa-tasks"></i> Всего задач</p>
+            </div>
+            <div class="stat-card">
+                <h3>{{ completed_tasks }}</h3>
+                <p><i class="fas fa-check-circle"></i> Выполнено</p>
+            </div>
+            <div class="stat-card">
+                <h3>{{ in_progress_tasks }}</h3>
+                <p><i class="fas fa-spinner"></i> В работе</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="profile-form">
+            <h2>
+                <i class="fas fa-edit"></i> Редактировать профиль
+            </h2>
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-user"></i> Имя:</label>
+                        {{ user_form.first_name }}
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-user"></i> Фамилия:</label>
+                        {{ user_form.last_name }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-at"></i> Имя пользователя:</label>
+                    {{ user_form.username }}
+                    {% if user_form.username.errors %}
+                        <div class="error">{{ user_form.username.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Email:</label>
+                    {{ user_form.email }}
+                    {% if user_form.email.errors %}
+                        <div class="error">{{ user_form.email.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-phone"></i> Телефон:</label>
+                    {{ profile_form.phone }}
+                    <small>Формат: +7 (XXX) XXX-XX-XX</small>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-quote-left"></i> О себе:</label>
+                    {{ profile_form.bio }}
+                    <small>Расскажите немного о себе (максимум 500 символов)</small>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-image"></i> Аватар:</label>
+                    {{ profile_form.avatar }}
+                    {% if profile.avatar %}
+                        <small>Текущий аватар: <strong>{{ profile.avatar.name }}</strong></small>
+                    {% endif %}
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i> Сохранить изменения
+                    </button>
+                    <a href="{% url 'tasks:planner' %}" class="btn-secondary">
+                        <i class="fas fa-times"></i> Отмена
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+</body>
+</html>

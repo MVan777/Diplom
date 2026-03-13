@@ -1,0 +1,35 @@
+{% extends 'app_base.html' %}
+{% load static %}
+
+{% block title %}Удалить проект{% endblock %}
+
+{% block content %}
+<div class="delete-confirm-container">
+    <div class="delete-header">
+        <div class="delete-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h1>Подтвердить удаление</h1>
+    </div>
+
+    <div class="delete-message">
+        <p><strong>Внимание!</strong> Вы собираетесь удалить проект. Это действие нельзя отменить.</p>
+    </div>
+
+    <div class="warning-message">
+        ⚠️ Проект "{{ project.name }}" и все его задачи будут удалены!
+    </div>
+
+    <div class="button-group">
+        <form method="post" class="form-full-width">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger btn-full-width">
+                <i class="fas fa-trash"></i> Удалить проект
+            </button>
+        </form>
+        <a href="{% url 'projects:detail' project.id %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Отмена
+        </a>
+    </div>
+</div>
+{% endblock %}

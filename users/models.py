@@ -39,7 +39,6 @@ class Profile(models.Model):
         ordering = ['user__username']
 
 
-# Сигналы для автоматического создания профиля при создании пользователя
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
@@ -48,4 +47,18 @@ def create_user_profile(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
+    if hasattr(instance, 'profile'):
+        instance.profile.save()
+
+
+class FeedBack(models.Model):
+    name = models.CharField(max_length=200, verbose_name="Тема")
+    text = models.TextField(max_length=1000, verbose_name="Текст обращения")
+    email = models.EmailField(max_length=200, verbose_name="E-mail")
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Обратная связь"
+        verbose_name_plural = "Обратные связи"

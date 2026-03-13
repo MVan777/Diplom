@@ -1,0 +1,259 @@
+{% extends 'app_base.html' %}
+{% load static %}
+
+{% block title %}{{ task.title }} - Детали задачи{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+<link rel="stylesheet" href="{% static 'css/task_detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="task-detail-layout">
+    <!-- Статистика плитками сверху -->
+    <div class="stats-grid">
+        <!-- Статус задачи -->
+        <div class="task-stat-card task-stat-card--status">
+            <div class="task-stat-card__icon">
+                <i class="fas {% if task.is_completed %}fa-check-circle{% else %}fa-clock{% endif %}"></i>
+            </div>
+            <div class="task-stat-card__label">Статус</div>
+            <div class="task-stat-card__value">
+                {% if task.is_completed %}✅ Выполнена sadasd{% else %}📋 В работе{% endif %}
+            </div>
+        </div>
+
+        <!-- Приоритет -->
+        <div class="task-stat-card task-stat-card--priority">
+            <div class="task-stat-card__icon">
+                <i class="fas fa-flag"></i>
+            </div>
+            <div class="task-stat-card__label">Приоритет</div>
+            <div class="task-stat-card__value">{{ task.get_priority_display }}</div>
+        </div>
+
+        <!-- Дедлайн -->
+        {% if task.deadline %}
+        <div class="task-stat-card task-stat-card--deadline">
+            <div class="task-stat-card__icon">
+                <i class="fas fa-hourglass-half"></i>
+            </div>
+            <div class="task-stat-card__label">До дедлайна</div>
+            <div class="task-stat-card__value" id="countdown-display">
+                <i class="fas fa-spinner fa-pulse"></i>
+            </div>
+            <div class="task-stat-card__subtitle">
+                {{ task.deadline|date:"j E Y H:i" }}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Проект -->
+        {% if task.project %}
+        <div class="task-stat-card task-stat-card--project">
+            <div class="task-stat-card__icon">
+                <i class="fas fa-folder"></i>
+            </div>
+            <div class="task-stat-card__label">Проект</div>
+            <div class="task-stat-card__value">
+                <a href="{% url 'projects:detail' project_id=task.project.id %}" class="task-stat-card__link">
+                    {{ task.project.name|truncatechars:20 }}
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Две колонки: Описание и Доп. информация -->
+    <div class="info-row">
+        <!-- Описание задачи -->
+        <div class="info-card">
+            <h3 class="info-card__title">
+                <i class="fas fa-align-left"></i>
+                Описание задачи
+            </h3>
+            <div class="info-card__content info-card__content--description">
+                {% if task.description %}
+                    {{ task.description|linebreaks }}
+                {% else %}
+                    <p class="text-muted">Описание отсутствует</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Дополнительная информация -->
+        <div class="info-card">
+            <h3 class="info-card__title">
+                <i class="fas fa-info-circle"></i>
+                Дополнительная информация
+            </h3>
+            <div class="info-card__content">
+                <div class="meta-grid">
+                    <div class="meta-item">
+                        <span class="meta-item__label">Автор:</span>
+                        <span class="meta-item__value">{{ task.user.username }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-item__label">Создано:</span>
+                        <span class="meta-item__value">{{ task.created_at|date:"j E Y H:i" }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-item__label">Обновлено:</span>
+                        <span class="meta-item__value">{{ task.updated_at|date:"j E Y H:i" }}</span>
+                    </div>
+                    {% if task.deadline %}
+                    <div class="meta-item">
+                        <span class="meta-item__label">Дедлайн:</span>
+                        <span class="meta-item__value">{{ task.deadline|date:"j E Y H:i" }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Исполнители -->
+    {% if task.assignments.exists %}
+    <div class="assignees-section">
+        <h3 class="assignees-section__title">
+            <i class="fas fa-users"></i>
+            Исполнители
+        </h3>
+        <div class="assignees-grid">
+            {% for assignment in task.assignments.all %}
+            <div class="assignee-card assignee-card--{{ assignment.status }}">
+                <div class="assignee-card__header">
+                    <strong class="assignee-card__name">{{ assignment.user.username }}</strong>
+                    <span class="assignee-card__badge">
+                        {{ assignment.get_status_display }}
+                    </span>
+                </div>
+                {% if assignment.report %}
+                <div class="assignee-card__report">
+                    <strong>Отчет:</strong> {{ assignment.report }}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Чат на всю ширину -->
+    <div class="chat-section">
+        <div class="chat-section__header">
+            <h3 class="chat-section__title">
+                <i class="fas fa-comments"></i>
+                Обсуждение задачи
+            </h3>
+        </div>
+
+        <div class="chat-messages-container" id="chatMessages">
+            <div class="chat-messages">
+                {% for comment in task.comments.all %}
+                <div class="chat-message">
+                    <div class="chat-message__header">
+                        <span class="chat-message__author">{{ comment.author.username }}</span>
+                        <span class="chat-message__time">{{ comment.created_at|date:"d.m.Y H:i" }}</span>
+                    </div>
+                    <p class="chat-message__text">{{ comment.text }}</p>
+                </div>
+                {% empty %}
+                <div class="chat-empty">
+                    <i class="fas fa-comment-dots"></i>
+                    <p>Сообщений пока нет. Будьте первым!</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <form method="POST" action="{% url 'tasks:add_comment' task.id %}" class="chat-form">
+            {% csrf_token %}
+            <textarea name="text" placeholder="Напишите сообщение..." required></textarea>
+            <button type="submit" class="chat-form__submit">
+                <i class="fas fa-paper-plane"></i>
+                Отправить
+            </button>
+        </form>
+    </div>
+
+    <!-- Кнопки действий -->
+    <div class="action-buttons">
+        <a href="{% if task.project %}{% url 'projects:detail' project_id=task.project.id %}{% else %}{% url 'tasks:task_filter' %}{% endif %}" class="action-btn action-btn--secondary">
+            <i class="fas fa-arrow-left"></i> Назад
+        </a>
+        <a href="{% url 'tasks:create_task' %}{% if task.project %}?project={{ task.project.id }}{% endif %}" class="action-btn action-btn--primary">
+            <i class="fas fa-plus"></i> Новая задача
+        </a>
+        <a href="{% url 'tasks:edit_task' pk=task.id %}" class="action-btn action-btn--primary">
+            <i class="fas fa-edit"></i> Редактировать
+        </a>
+        {% if task.user == request.user %}
+        <a href="{% url 'tasks:assign_task' task.id %}" class="action-btn action-btn--primary">
+            <i class="fas fa-user-check"></i> Назначить
+        </a>
+        {% endif %}
+        <form method="post" action="{% url 'tasks:delete_task' task.pk %}" style="display: inline;" onsubmit="return confirm('Удалить задачу?');">
+            {% csrf_token %}
+            <button type="submit" class="action-btn action-btn--danger">
+                <i class="fas fa-trash"></i> Удалить
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    {% if task.deadline %}
+    const deadline = new Date("{{ task.deadline|date:'c' }}");
+
+    function updateCountdown() {
+        const now = new Date();
+        const diff = deadline - now;
+        const countdownDisplay = document.getElementById('countdown-display');
+
+        if (diff <= 0) {
+            countdownDisplay.innerHTML = "Время вышло!";
+            return;
+        }
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+        let result = "";
+        if (days > 0) result += `${days}д `;
+        if (hours > 0) result += `${hours}ч `;
+        result += `${minutes}мин`;
+
+        countdownDisplay.innerHTML = result;
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 60000);
+    {% endif %}
+
+    // Прокрутка чата вниз при загрузке
+    const chatMessages = document.getElementById('chatMessages');
+    if (chatMessages) {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+});
+
+// Функция для прокрутки чата после отправки сообщения
+function scrollChatToBottom() {
+    const chatMessages = document.getElementById('chatMessages');
+    if (chatMessages) {
+        setTimeout(() => {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }, 100);
+    }
+}
+
+// Вызываем при отправке формы
+document.querySelector('.chat-form')?.addEventListener('submit', function() {
+    scrollChatToBottom();
+});
+</script>
+{% endblock %}

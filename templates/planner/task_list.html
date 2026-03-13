@@ -1,0 +1,77 @@
+{% load static %}
+
+{% block title %}Список задач - Smart-Planner{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/tasks.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="tasks-list-container">
+    <div class="tasks-header">
+        <h1><i class="fas fa-tasks"></i> Список задач</h1>
+        <a href="{% url 'tasks:create_task' %}" class="btn-create">
+            <i class="fas fa-plus"></i> Новая задача
+        </a>
+    </div>
+
+    <!-- Быстрые фильтры -->
+    <div class="quick-filters">
+        <strong>Быстрые фильтры:</strong>
+        <div class="filter-buttons">
+            <button class="quick-filter-btn {% if request.GET.priority == 'urgent' %}active{% endif %}" data-filter-type="priority" data-value="urgent">
+                🔴 Срочные
+            </button>
+            <button class="quick-filter-btn {% if request.GET.priority == 'average' %}active{% endif %}" data-filter-type="priority" data-value="average">
+                🟡 Средние
+            </button>
+            <button class="quick-filter-btn {% if request.GET.priority == 'ordinary' %}active{% endif %}" data-filter-type="priority" data-value="ordinary">
+                🔵 Обычные
+            </button>
+            <button class="quick-filter-btn {% if request.GET.status == 'active' %}active{% endif %}" data-filter-type="status" data-value="active">
+                📋 Активные
+            </button>
+            <button class="quick-filter-btn {% if request.GET.status == 'overdue' %}active{% endif %}" data-filter-type="status" data-value="overdue">
+                ⚠️ Просроченные
+            </button>
+            <button class="quick-filter-btn reset-btn" id="reset-filter">
+                🗑️ Сбросить
+            </button>
+        </div>
+    </div>
+
+    <!-- Контейнер для результатов -->
+    <div id="tasks-container" class="tasks-container">
+        {% include 'planner/_task_list_partial.html' %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const filterButtons = document.querySelectorAll('.quick-filter-btn:not(.reset-btn)');
+    const resetButton = document.getElementById('reset-filter');
+
+    function loadTasks(filterType = null, filterValue = null) {
+        let url = '{% url "tasks:task_filter" %}';
+
+        if (filterType && filterValue) {
+            url += `?${filterType}=${filterValue}`;
+        }
+
+        window.location.href = url;
+    }
+
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const filterType = this.dataset.filterType;
+            const filterValue = this.dataset.value;
+            loadTasks(filterType, filterValue);
+        });
+    });
+
+    resetButton.addEventListener('click', function() {
+        window.location.href = '{% url "tasks:task_filter" %}';
+    });
+});
+</script>
+{% endblock %}

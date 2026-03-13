@@ -40,6 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'users',
     'tasks',
+    'projects',
+    'assignments',
+    'comments',
 ]
 
 MIDDLEWARE = [
@@ -117,9 +120,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
+AUTH_USER_MODEL = 'auth.User'
+
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [
-    BASE_DIR / "static",
+    os.path.join(BASE_DIR, "static"),
 ]
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / "media"

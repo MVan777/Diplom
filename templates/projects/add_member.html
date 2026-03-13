@@ -1,0 +1,41 @@
+{% extends 'app_base.html' %}
+{% load static %}
+
+{% block title %}Добавить участника{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="form-header">
+        <h1><i class="fas fa-user-plus"></i> Добавить участника</h1>
+        <p class="project-subtitle">Проект: <strong>{{ project.name }}</strong></p>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="username">Имя пользователя *</label>
+            <input type="text" id="username" name="username" placeholder="Введите имя пользователя" required>
+            <div class="hint">Введите точное имя пользователя</div>
+        </div>
+
+        <div class="form-group">
+            <label for="role">Роль в проекте</label>
+            <select id="role" name="role">
+                <option value="member">Участник</option>
+                <option value="manager">Менеджер</option>
+                <option value="observer">Наблюдатель</option>
+            </select>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-check"></i> Добавить
+            </button>
+            <a href="{% url 'projects:detail' project.id %}" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Отмена
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

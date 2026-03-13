@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Вход в систему{% endblock %}
+{% block content %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/auth.css' %}">
+
+<div class="login-container">
+    <div class="login-header">
+      <h1>Добро пожаловать</h1>
+      <p>Восстановления доступа учётной записи</p>
+    </div>
+
+    <form>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="text" id="email" placeholder="Введите ваш email">
+        </div>
+
+        <button type="submit" class="login-button">Восстановить доступ</button>
+    </form>
+
+    <div class="signup-link">
+      <p>Еще нет аккаунта? <a href="{% url 'signup' %}">Зарегистрироваться</a> </p>
+    </div>
+    <div class="signup-link">
+        <p><a href="{% url 'home' %}">Вернутся на главную страницу</a></p>
+    </div>
+</div>
+{% endblock %}

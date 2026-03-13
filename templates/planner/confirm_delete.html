@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Подтвердить удаление - {{ task.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .delete-confirm-container {
+        max-width: 500px;
+        margin: 3rem auto;
+        padding: 2rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        border: 3px solid #e74c3c;
+    }
+
+    .delete-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .delete-icon {
+        font-size: 3rem;
+        color: #e74c3c;
+        margin-bottom: 1rem;
+    }
+
+    .delete-header h1 {
+        color: #e74c3c;
+        margin: 0 0 0.5rem 0;
+        font-size: 1.8rem;
+    }
+
+    .delete-message {
+        background: #f5f5f5;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid #e74c3c;
+    }
+
+    .task-details {
+        background: #fafafa;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+    }
+
+    .task-details p {
+        margin: 0.5rem 0;
+        color: #555;
+    }
+
+    .task-details strong {
+        color: #333;
+    }
+
+    .warning-message {
+        color: #e74c3c;
+        font-style: italic;
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        background: #ffe0e0;
+        border-radius: 8px;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+    }
+
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        flex: 1;
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        color: white;
+    }
+
+    .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+    }
+
+    .btn-secondary {
+        background: #e0e0e0;
+        color: #333;
+    }
+
+    .btn-secondary:hover {
+        background: #d0d0d0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="delete-confirm-container">
+    <div class="delete-header">
+        <div class="delete-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h1>Подтвердить удаление</h1>
+    </div>
+
+    <div class="delete-message">
+        <p><strong>Внимание!</strong> Вы собираетесь удалить задачу. Это действие нельзя отменить.</p>
+    </div>
+
+    <div class="task-details">
+        <p><strong>Название:</strong> {{ task.title }}</p>
+        <p><strong>Приоритет:</strong> {{ task.get_priority_display }}</p>
+        <p><strong>Дедлайн:</strong> {{ task.deadline|date:"j E Y г. H:i" }}</p>
+        <p><strong>Статус:</strong> {% if task.is_completed %}✅ Выполнена{% else %}📋 В работе{% endif %}</p>
+    </div>
+
+    <div class="warning-message">
+        ⚠️ Если вы удалите эту задачу, все связанные данные (комментарии, назначения) также будут удалены!
+    </div>
+
+    <div class="button-group">
+        <form method="post" style="flex: 1;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger" style="width: 100%;">
+                <i class="fas fa-trash"></i> Удалить задачу
+            </button>
+        </form>
+        <a href="{% url 'tasks:task_detail' task.pk %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Отмена
+        </a>
+    </div>
+</div>
+{% endblock %}

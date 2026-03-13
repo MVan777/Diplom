@@ -1,0 +1,52 @@
+{% extends 'app_base.html' %}
+{% load static %}
+
+{% block title %}Чат - {{ project.name }}{% endblock %}
+
+{% block content %}
+<!-- Чат на всю ширину -->
+    <div class="chat-section">
+        <div class="chat-section__header">
+            <h3 class="chat-section__title">
+                <i class="fas fa-comments"></i></h3>
+        <p>{{ project.name }}</p>
+    </div>
+
+    <!-- Сообщения -->
+        <div class="chat-messages-container" id="chatMessages">
+            <div class="chat-messages">
+
+            {% if comments %}
+            {% for comment in comments %}
+            <div class="chat-message">
+                    <div class="chat-message__header">
+                        <span class="chat-message__author">{{ comment.author.username }}</span>
+                        <span class="chat-message__time">{{ comment.created_at|date:"d.m.Y H:i" }}</span>
+                    </div>
+                    <p class="chat-message__text">{{ comment.text }}</p>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-messages">
+                <p><i class="fas fa-comments empty-icon"></i></p>
+                <p>Сообщений нет. Будьте первым!</p>
+            </div>
+        {% endif %}
+    </div>
+    </div>
+
+    <!-- Форма добавления сообщения -->
+    <form method="post" class="chat-form">
+        {% csrf_token %}
+        <textarea name="text" placeholder="Напишите сообщение..." required></textarea>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-paper-plane"></i> Отправить
+            </button>
+            <a href="{% url 'projects:detail' project.id %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> К проекту
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% if tasks %}
+    {% for task in tasks %}
+        <div class="task-item">
+            <div class="task-info">
+                <h3>
+                    <a href="{% url 'tasks:task_detail' task.pk %}">{{ task.title }}</a>
+                    <span class="priority-badge priority-{{ task.priority }}">
+                        {{ task.get_priority_display }}
+                    </span>
+                </h3>
+                {% if task.description %}
+                    <p class="task-description">{{ task.description|truncatechars:100 }}</p>
+                {% endif %}
+                <div class="task-meta">
+                    <span><i class="fas fa-calendar"></i> {{ task.deadline|date:"d.m.Y H:i" }}</span>
+                    <span><i class="fas fa-user"></i> {{ task.user.username }}</span>
+                    {% if task.project %}
+                        <span><i class="fas fa-folder"></i> {{ task.project.name }}</span>
+                    {% endif %}
+                    <span class="task-status status-{% if task.is_completed %}completed{% elif task.deadline < now %}overdue{% else %}active{% endif %}">
+                        {% if task.is_completed %}
+                            ✓ Выполнено
+                        {% elif task.deadline < now %}
+                            ⚠️ Просрочено
+                        {% else %}
+                            ⟳ В работе
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+            <div class="task-actions">
+                <a href="{% url 'tasks:edit_task' task.pk %}" class="btn-small btn-edit" title="Редактировать">
+                    <i class="fas fa-edit"></i>
+                </a>
+                <form method="post" action="{% url 'tasks:complete_task' task.pk %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-small btn-success" title="{% if task.is_completed %}Вернуть в работу{% else %}Завершить{% endif %}">
+                        <i class="fas {% if task.is_completed %}fa-undo{% else %}fa-check{% endif %}"></i>
+                    </button>
+                </form>
+                <form method="post" action="{% url 'tasks:delete_task' task.pk %}" style="display: inline;" onsubmit="return confirm('Удалить задачу?');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-small btn-danger" title="Удалить">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    {% endfor %}
+
+    <div class="tasks-stats">
+        <div class="list-stat-card">
+            <div class="number">{{ tasks|length }}</div>
+            <div class="label">Всего задач</div>
+        </div>
+        <div class="list-stat-card">
+            <div class="number">{{ tasks_completed|default:0 }}</div>
+            <div class="label">Выполнено</div>
+        </div>
+        <div class="list-stat-card">
+            <div class="number">{{ tasks_overdue|default:0 }}</div>
+            <div class="label">Просрочено</div>
+        </div>
+    </div>
+{% else %}
+    <div class="empty-state">
+        <i class="fas fa-inbox"></i>
+        <h2>Задачи не найдены</h2>
+        <p>Попробуйте изменить параметры фильтрации или создайте новую задачу</p>
+        <a href="{% url 'tasks:create_task' %}" class="btn-create">
+            <i class="fas fa-plus"></i> Создать задачу
+        </a>
+    </div>
+{% endif %}

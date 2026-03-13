@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Обратная связь{% endblock %}
+
+{% block content %}
+<div>
+    <div>
+        <span style="font-size: 35px;">КнижныйМир</span>
+        <p>Магазин:</p>
+        <p>
+            Адрес: <span>г. Арамиль</span>, <span class="street-address">ул. Рабочая, д.120</span>&nbsp;
+        </p>
+        <p>Телефоны:</p>
+        <ul>
+            <li ><a style="color: orange;" href="tel:+73432312333">+7 (343) 123 12 33</a></li>
+            <li ><a style="color: orange;" href="tel:8800800800">8 (800) 800-80-00</a></li>
+        </ul>
+        <p>Время работы: <span>08:00 - 19:00</span></p>
+        <p >Отдел интернет-продаж:</p>
+        <p >
+            Адрес: <span>г. Екатеринбург</span>, <span
+                class="street-address">ул. Айвазовского, д.123</span>
+        </p>
+        <p>E-mail: <span><a href="mailto:knijniymir@mail.ru">knijniymir@mail.ru</a></span></p>
+        <p>
+            Время работы: <span style="text-decoration: underline; color: blue;">08:00 - 18:00&nbsp;пн - пт; 09:00 - 18:00 сб;&nbsp; выходной - вс.</span>
+        </p>
+    </div>
+    <div>
+        <iframe src="https://yandex.ru/map-widget/v1/?um=constructor%3Ac9fc80cb9013f6f08b8ec54d51495b15bbcfc12d9ba5109dd821b06723c8d4ba&amp;source=constructor" width="811" height="546" frameborder="0"></iframe>
+    </div>
+</div>
+{% endblock %}

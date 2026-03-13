@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>{% block title %}{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="{% url 'home' %}" class="logo">
+                    <i class="fas fa-tasks"></i> Smart-Planner
+                </a>
+
+                <ul class="nav-links">
+                    <li><a href="{% url 'home' %}#home">Главная</a></li>
+                    <li><a href="{% url 'home' %}#features">Возможности</a></li>
+                    <li><a href="{% url 'home' %}#pricing">Тарифы</a></li>
+                    <li><a href="{% url 'home' %}#testimonials">Отзывы</a></li>
+                    <li><a href="{% url 'home' %}#faq">FAQ</a></li>
+                    {% if user.is_authenticated %}
+                    <li><a href="{% url 'tasks:planner' %}">Планировщик</a></li>
+                    {% endif %}
+                </ul>
+
+                <div class="auth-buttons">
+                    {% if user.is_authenticated %}
+                        <span class="user-greeting">Привет, {{ user.username }}!</span>
+                        <a href="{% url 'tasks:planner' %}" class="btn">Планировщик</a>
+                        <a href="{% url 'users:logout' %}" class="btn btn-secondary">Выйти</a>
+                    {% else %}
+                        <a href="{% url 'users:signin' %}" class="btn">Войти</a>
+                        <a href="{% url 'users:signup' %}" class="btn btn-secondary">Регистрация</a>
+                    {% endif %}
+                </div>
+
+                <button class="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <footer class="footer" id="contact">
+        {% block content_footer %}
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-col">
+                    <div class="footer-logo">
+                        <i class="fas fa-tasks"></i> Smart-Planner
+                    </div>
+                    <p>Современный планировщик задач для команд и индивидуальных пользователей.</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Ссылки</h3>
+                    <ul>
+                        <li><a href="{% url 'users:feedback' %}">Обратная связь</a></li>
+                        <li><a href="{% url 'users:contact' %}">Контакты</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2024 Smart-Planner. Все права защищены.</p>
+            </div>
+        </div>
+        {% endblock %}
+    </footer>
+
+    <script>
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        const navLinks = document.querySelector('.nav-links');
+        const authButtons = document.querySelector('.auth-buttons');
+
+        if (mobileMenuBtn && navLinks && authButtons) {
+            mobileMenuBtn.addEventListener('click', () => {
+                const isVisible = navLinks.style.display === 'flex';
+                navLinks.style.display = isVisible ? 'none' : 'flex';
+                authButtons.style.display = isVisible ? 'none' : 'flex';
+
+                if (!isVisible) {
+                    navLinks.style.flexDirection = 'column';
+                    navLinks.style.position = 'absolute';
+                    navLinks.style.top = '100%';
+                    navLinks.style.left = '0';
+                    navLinks.style.right = '0';
+                    navLinks.style.background = 'white';
+                    navLinks.style.padding = '20px';
+                    navLinks.style.boxShadow = '0 10px 20px rgba(0,0,0,0.1)';
+
+                    authButtons.style.flexDirection = 'column';
+                    authButtons.style.position = 'absolute';
+                    authButtons.style.top = 'calc(100% + 200px)';
+                    authButtons.style.left = '20px';
+                    authButtons.style.right = '20px';
+                }
+            });
+        }
+
+        // Close mobile menu on link click
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    navLinks.style.display = 'none';
+                    authButtons.style.display = 'none';
+                }
+            });
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                if (this.getAttribute('href') === '#') return;
+
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

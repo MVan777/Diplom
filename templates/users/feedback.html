@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Обратная связь{% endblock %}
+
+{% block content %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/feedback.css' %}">
+
+<div class="feedback-container">
+    <h1>Форма обратной связи</h1>
+    <div class="feedback-card">
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_name">Тема обращения</label>
+                <input style="width: 50%" type="text" name="name" id="id_name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="id_email">Email</label>
+                <input style="width: 50%" type="email" name="email" id="id_email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="id_text">Текст обращения</label>
+                <textarea name="text" id="id_text" required></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn">Отправить</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
