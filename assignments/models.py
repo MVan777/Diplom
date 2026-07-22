@@ -4,8 +4,7 @@ from tasks.models import Task
 from django.utils import timezone
 
 class TaskAssignment(models.Model):
-    """Назначение задачи пользователю"""
-    
+
     class Status(models.TextChoices):
         PENDING = 'pending', 'Ожидает'
         IN_PROGRESS = 'in_progress', 'В работе'

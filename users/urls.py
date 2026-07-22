@@ -13,3 +13,4 @@ urlpatterns = [
     path('feedback/', feedback, name='feedback'),
     path('contact/', contact, name='contact'),
 ]
+

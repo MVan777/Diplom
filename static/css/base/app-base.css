@@ -1,12 +1,177 @@
-/* App Header - компактная навигация без главного меню */
-.app-header {
+/* ===== Убираем инлайн-стили в классы ===== */
+
+/* Контейнер для фильтров */
+.filter-form {
+    margin-bottom: 20px;
+}
+
+.filter-form form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    align-items: flex-end;
+}
+
+.filter-form .form-group {
+    margin: 0;
+}
+
+.filter-form label {
+    font-weight: 600;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.filter-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.filter-actions .btn {
+    margin: 0;
+}
+
+.filter-actions .btn-secondary {
+    text-decoration: none;
+}
+
+
+.stats-card-tasks {
     background: white;
-    border-bottom: 1px solid var(--gray-lighter);
-    padding: 0.75rem 0;
-    box-shadow: var(--shadow-sm);
-    position: sticky;
-    top: 0;
-    z-index: 50;
+    padding: 3px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 2px 8px #4dabf7;;
+}
+
+.stats-card-tasks .stats-number {
+    font-size: 15px;
+    font-weight: bold;
+    color: #4dabf7;
+}
+
+.stats-card-tasks .stats-label {
+    font-size: 10px;
+    color: #666;
+}
+
+/* Список задач */
+.tasks-list-container {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.task-item {
+    padding: 20px;
+    border-bottom: 1px solid #f0f0f0;
+    transition: all 0.2s;
+}
+
+.task-item:last-child {
+    border-bottom: none;
+}
+
+.task-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.task-info {
+    flex: 1;
+}
+
+.task-title {
+    margin: 0 0 10px 0;
+}
+
+.task-title a {
+    color: #333;
+    text-decoration: none;
+}
+
+.task-description {
+    margin: 5px 0;
+    color: #666;
+    font-size: 13px;
+}
+
+.task-meta {
+    color: #999;
+    font-size: 12px;
+}
+
+.task-actions {
+    display: flex;
+    gap: 5px;
+    margin-left: 15px;
+}
+
+.task-actions .btn {
+    padding: 8px 12px;
+    font-size: 12px;
+    margin: 0;
+}
+
+/* Приоритеты */
+.priority-urgent {
+    background: #dc3545;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    margin-left: 10px;
+}
+
+.priority-average {
+    background: #ffc107;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    margin-left: 10px;
+}
+
+
+
+/* Статусы */
+.status-overdue {
+    color: #dc3545;
+}
+
+.status-deadline {
+    color: #28a745;
+}
+
+.status-completed {
+    color: #28a745;
+}
+
+.status-in-progress {
+    color: #28a745;
+}
+
+.status-started {
+    color: #ffc107;
+}
+
+/* Empty state */
+.empty-state {
+    padding: 40px;
+    text-align: center;
+    color: #999;
+}
+
+.empty-state i {
+    font-size: 48px;
+    margin-bottom: 15px;
+    opacity: 0.5;
+}
+
+.empty-state p {
+    margin-bottom: 5px;
 }
 
 .app-navbar {
@@ -36,89 +201,52 @@
     color: var(--primary-dark);
 }
 
-/* Пользовательское меню */
-.app-user-menu {
+/* Сделать main-content шире и по центру */
+.main-content-dash {
+    flex: 1;
+    max-width: calc(100% - 280px); /* ширина сайдбара 280px */
+    margin: 0 auto;
+}
+
+/* Если нужен отступ справа для симметрии */
+.dashboard-panel {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 20px 30px;
+}
+
+/* Альтернатива - центрирование через родителя */
+.app-container {
     display: flex;
-    align-items: center;
-    gap: 1rem;
+    justify-content: center; /* центрируем содержимое */
 }
 
-.user-greeting {
-    color: var(--gray);
-    font-size: var(--font-size-small);
-    font-weight: 500;
+.sidebar_task {
+    width: 280px;
+    flex-shrink: 0;
 }
 
-.nav-link {
-    color: var(--gray);
-    text-decoration: none;
-    font-size: var(--font-size-small);
-    padding: 0.5rem 0.75rem;
-    border-radius: var(--radius);
-    transition: var(--transition);
+.main-content {
+    flex: 1;
+    max-width: 1400px; /* максимальная ширина контента */
 }
 
-.nav-link:hover {
-    background: var(--light);
-    color: var(--primary);
-}
-
-.nav-icon {
+.app-container {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    border-radius: var(--radius-full);
-    color: var(--primary);
-    transition: var(--transition);
-    text-decoration: none;
+    min-height: 100vh;
+    margin-top: 70px;
 }
 
-.nav-icon:hover {
-    background: var(--light);
-    color: var(--primary-dark);
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
-/* App Main Content */
 .app-main {
-    min-height: calc(100vh - 200px);
-    padding: 2rem 0;
+    flex: 1;
 }
 
-/* Footer */
 .footer {
-    background: var(--light);
-    border-top: 1px solid var(--gray-lighter);
-    padding: 2rem 0;
-    margin-top: 3rem;
-    text-align: center;
-    color: var(--gray);
-    font-size: var(--font-size-small);
-}
-
-.footer p {
-    margin: 0;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .app-navbar {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-    }
-    
-    .app-user-menu {
-        width: 100%;
-        justify-content: flex-start;
-    }
-    
-    .user-greeting {
-        display: none;
-    }
-    
-    .app-navbar .logo {
-        font-size: 1.1rem;
-    }
+    margin-top: auto;
 }

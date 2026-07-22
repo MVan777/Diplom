@@ -20,21 +20,23 @@
                 </div>
                 {% endif %}
             </div>
-            <p class="project-hero__description">{{ project.description|default:"Нет описания" }}</p>
-            <div class="project-hero__meta">
-                <span><i class="fas fa-calendar-alt"></i> Создан: {{ project.created_at|date:"j E Y г." }}</span>
-                <span><i class="fas fa-user"></i> Владелец: {{ project.owner.username }}</span>
-            </div>
+            <p class="project-hero__description">{{ project.description|default:"Нет описания"|truncatechars:50 }}</p>
         </div>
 
         {% if is_owner %}
         <div class="project-hero__actions">
-            <a href="{% url 'projects:edit' project.id %}" class="hero-btn hero-btn--edit">
-                <i class="fas fa-edit"></i> Редактировать
-            </a>
-            <a href="{% url 'projects:delete' project.id %}" class="hero-btn hero-btn--delete">
-                <i class="fas fa-trash"></i> Удалить
-            </a>
+            <div class="project-hero__buttons">
+                <a href="{% url 'projects:edit' project.id %}" class="hero-btn hero-btn--edit">
+                    <i class="fas fa-edit"></i> Редактировать
+                </a>
+                <a href="{% url 'projects:delete' project.id %}" class="hero-btn hero-btn--delete">
+                    <i class="fas fa-trash"></i> Удалить
+                </a>
+            </div>
+            <div class="project-hero__meta">
+                <span><i class="fas fa-calendar-alt"></i> Создан: {{ project.created_at|date:"j E Y г." }}</span>
+                <span><i class="fas fa-user"></i> Владелец: {{ project.owner.username }}</span>
+            </div>
         </div>
         {% endif %}
     </div>
@@ -66,7 +68,7 @@
                 <i class="fas fa-users"></i>
             </div>
             <div class="task-stat-card__content">
-                <div class="task-stat-card__value">{{ project.members.count }}</div>
+                <div class="project-stat-card__value">{{ project.members.count }}</div>
                 <div class="task-stat-card__label">Участников</div>
             </div>
         </div>
@@ -98,20 +100,82 @@
                         <i class="fas fa-tasks"></i>
                         Задачи проекта
                     </h2>
-                    <a href="{% url 'tasks:create_task' %}?project={{ project.id }}" class="btn btn--primary btn--with-icon">
-                        <i class="fas fa-plus"></i>
-                        Добавить задачу
-                    </a>
+                        <button class="btn btn--primary btn--with-icon" id="quickAddBtn">
+                        <i class="fas fa-plus"></i> Новая задача
+                    </button>
+
+                    <!-- Модальное окно создания задачи -->
+                        <div class="modal-overlay" id="taskModal">
+                            <div class="modal-dialog">
+                                <div class="modal-header">
+                                    <h3 class="modal-title">
+                                        <i class="fas fa-plus"></i>
+                                        Добавить задачу
+                                    </h3>
+                                    <button class="modal-close" id="closeModalBtn">&times;</button>
+                                </div>
+                                <div class="modal-body">
+                                    <form method="POST" action="{% url 'tasks:create_task' %}" id="taskForm">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="project" value="{{ project.id }}">
+                                        <div class="form-group">
+                                            <label class="form-label">
+                                                <i class="fas fa-heading"></i> Название
+                                            </label>
+                                            <input type="text" name="title" class="form-input"
+                                                   placeholder="Название задачи" required maxlength="200">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label">
+                                                <i class="fas fa-align-left"></i> Описание
+                                            </label>
+                                            <textarea name="description" class="form-textarea" rows="4"
+                                                      placeholder="Описание (необязательно)" maxlength="1000"></textarea>
+                                        </div>
+
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <label class="form-label">
+                                                    <i class="fas fa-flag"></i> Приоритет
+                                                </label>
+                                                <select name="priority" class="form-select">
+                                                    <option value="ordinary">🟢 Обычный</option>
+                                                    <option value="average" selected>🟡 Средний</option>
+                                                    <option value="urgent">🔴 Срочный</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="form-label">
+                                                    <i class="fas fa-clock"></i> Срок
+                                                </label>
+                                                <input type="datetime-local" name="deadline" class="form-input" required>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-actions">
+                                            <button type="button" class="btn" id="cancelBtn" style="background: #e9ecef; color: #495057;">
+                                                Отмена
+                                            </button>
+                                            <button type="submit" class="btn btn-success">
+                                                <i class="fas fa-save"></i> Создать задачу
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
                 </div>
 
                 {% if project.project_tasks.all %}
                     <div class="tasks-list">
                         {% for task in project.project_tasks.all %}
-                        <div class="task-card {% if task.is_completed %}task-card--completed{% endif %}">
-                            <div class="task-card__content">
+                        <div class="task-card {% if task.is_completed %}task-card--completed{% else %}task-card--no_completed{% endif %}">
+                            <div class="task-card__content" onclick="location.href='{% url 'tasks:task_detail' task.id %}'" style="cursor: pointer;">
                                 <div class="task-card__header">
                                     <h3 class="task-card__title">
-                                        <a href="{% url 'tasks:task_detail' task.id %}">{{ task.title }}</a>
+                                        <a href="{% url 'tasks:task_detail' task.id %}" onclick="event.stopPropagation()">{{ task.title }}</a>
                                     </h3>
                                     <div class="task-card__priority priority-{{ task.priority }}">
                                         {% if task.priority == 'urgent' %}
@@ -127,38 +191,46 @@
                                 {% if task.description %}
                                 <p class="task-card__description">{{ task.description|truncatechars:100 }}</p>
                                 {% endif %}
+                            </div>
+
+                            <div class="task-card__right">
+                                <div class="task-card__actions">
+                                    <a href="{% url 'tasks:edit_task' task.id %}" class="task-action task-action--edit" title="Редактировать">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+
+                                    <form method="post" action="{% url 'tasks:complete_task' task.id %}" style="display: inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="task-action {% if task.is_completed %}task-action--complete{% else %}task-action--no_complete{% endif %}" title="{% if task.is_completed %}Отменить выполнение{% else %}Выполнить{% endif %}">
+                                            {% if task.is_completed %}
+                                            <i class="fas fa-check-double"></i>
+                                            {% else %}
+                                            <i class="fas fa-check"></i>
+                                            {% endif %}
+                                        </button>
+                                    </form>
+
+                                    <form method="post" action="{% url 'tasks:delete_task' task.id %}" style="display: inline;" onsubmit="return confirm('Удалить задачу?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="task-action task-action--delete" title="Удалить">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
 
                                 <div class="task-card__meta">
-                                    <div class="task-card__deadline">
+                                    <span class="task-card__deadline">
                                         <i class="fas fa-clock"></i>
                                         {{ task.deadline|date:"d.m.Y H:i" }}
-                                    </div>
-                                    <div class="task-card__status status-{% if task.is_completed %}completed{% else %}active{% endif %}">
+                                    </span>
+                                    <span class="task-card__status status-{% if task.is_completed %}completed{% else %}active{% endif %}">
                                         {% if task.is_completed %}
                                             ✓ Выполнено
                                         {% else %}
                                             ⟳ В работе
                                         {% endif %}
-                                    </div>
+                                    </span>
                                 </div>
-                            </div>
-
-                            <div class="task-card__actions">
-                                <a href="{% url 'tasks:edit_task' task.id %}" class="task-action task-action--edit" title="Редактировать">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <form method="post" action="{% url 'tasks:complete_task' task.id %}" style="display: inline;">
-                                    {% csrf_token %}
-                                    <button type="submit" class="task-action task-action--complete" title="Выполнить">
-                                        <i class="fas fa-check"></i>
-                                    </button>
-                                </form>
-                                <form method="post" action="{% url 'tasks:delete_task' task.id %}" style="display: inline;" onsubmit="return confirm('Удалить задачу?');">
-                                    {% csrf_token %}
-                                    <button type="submit" class="task-action task-action--delete" title="Удалить">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
                             </div>
                         </div>
                         {% endfor %}
@@ -176,6 +248,48 @@
                         </a>
                     </div>
                 {% endif %}
+                <div class="project-chat-section">
+                    <div class="chat-section__header">
+                        <h3 class="chat-section__title">
+                            <i class="fas fa-comments"></i> Чат проекта
+                        </h3>
+                        <p class="chat-project-name">{{ project.name }}</p>
+                    </div>
+
+                    <!-- Сообщения -->
+                    <div class="chat-messages-container" id="chatMessages">
+                        <div class="chat-messages">
+                            {% if comments %}
+                                {% for comment in comments %}
+                                <div class="chat-message">
+                                    <div class="chat-message__header">
+                                        <span class="chat-message__author">{{ comment.author.username }}</span>
+                                        <span class="chat-message__time">{{ comment.created_at|date:"d.m.Y H:i" }}</span>
+                                    </div>
+                                    <p class="chat-message__text">{{ comment.text }}</p>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="empty-messages">
+                                    <i class="fas fa-comments empty-icon"></i>
+                                    <p>Сообщений нет. Будьте первым!</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Форма добавления сообщения -->
+                    <form method="post" action="{% url 'projects:detail' project.id %}" class="chat-form">
+                        {% csrf_token %}
+                        <textarea name="text" placeholder="Напишите сообщение..." required></textarea>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane"></i> Отправить
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
             </div>
         </div>
 
@@ -225,13 +339,13 @@
                 </div>
 
                 <div class="action-list">
-                    <a href="{% url 'projects:chat' project.id %}" class="action-item">
+                    <a href="{% url 'tasks:planner' %}" class="action-item">
                         <div class="action-item__icon">
-                            <i class="fas fa-comments"></i>
+                            <i class="fas fa-th-large"></i>
                         </div>
                         <div class="action-item__content">
-                            <div class="action-item__title">Чат проекта</div>
-                            <div class="action-item__subtitle">Обсуждение и комментарии</div>
+                            <div class="action-item__title">Планировщик</div>
+                            <div class="action-item__subtitle">Вернутся на главную страницу</div>
                         </div>
                         <i class="fas fa-chevron-right action-item__arrow"></i>
                     </a>
@@ -258,7 +372,7 @@
                     </h3>
                 </div>
 
-                                <div class="info-list">
+                <div class="info-list">
                     <div class="info-item">
                         <span class="info-item__label">Владелец:</span>
                         <span class="info-item__value">{{ project.owner.username }}</span>
@@ -275,5 +389,65 @@
             </div>
         </div>
     </div>
+
+
 </div>
+<script src="{% static 'js/planner.js' %}"></script>
+<script>
+document.querySelector('.chat-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const form = this;
+    const textarea = form.querySelector('textarea');
+    const text = textarea.value.trim();
+
+    if (!text) return;
+
+    fetch(form.action, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            'text': text
+        })
+    }).then(response => {
+        if (response.ok) {
+            // Создаём новое сообщение
+            const newMessage = document.createElement('div');
+            newMessage.className = 'chat-message';
+            newMessage.innerHTML = `
+                <div class="chat-message__header">
+                    <span class="chat-message__author">{{ request.user.username }}</span>
+                    <span class="chat-message__time">${new Date().toLocaleString()}</span>
+                </div>
+                <p class="chat-message__text">${escapeHtml(text)}</p>
+            `;
+
+            // Добавляем в конец списка сообщений
+            const messagesContainer = document.querySelector('.chat-messages');
+            const emptyMessages = messagesContainer.querySelector('.empty-messages');
+
+            if (emptyMessages) {
+                emptyMessages.remove();  // Удаляем "нет сообщений"
+            }
+
+            messagesContainer.appendChild(newMessage);
+
+            // Очищаем поле и скроллим вниз
+            textarea.value = '';
+            const chatContainer = document.getElementById('chatMessages');
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+    });
+});
+
+// Функция для защиты от XSS
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+</script>
 {% endblock %}

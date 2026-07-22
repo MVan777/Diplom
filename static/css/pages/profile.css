@@ -4,25 +4,19 @@
     box-sizing: border-box;
 }
 
-body {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 100vh;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    padding: 20px;
-}
-
 .profile-wrapper {
-    max-width: 800px;
+    max-width: 1000px;
     margin: 0 auto;
+    padding: 1rem;
 }
 
 .back-btn {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 10px 20px;
-    background: rgba(255, 255, 255, 0.2);
-    color: black;
+    padding: 8px 16px;
+    background: #f0f0f0;
+    color: #333;
     border: none;
     border-radius: 8px;
     cursor: pointer;
@@ -30,39 +24,43 @@ body {
     text-decoration: none;
     transition: all 0.3s;
     font-size: 14px;
+    margin: 0 30px 20px;
 }
 
 .back-btn:hover {
-    background: rgba(255, 255, 255, 0.7);
-    transform: translateX(-5px);
-    color: #4dabf7;
+    background: #e0e0e0;
+    transform: translateX(-3px);
+    color: #667eea;
 }
 
 .profile-container {
     background: white;
-    border-radius: 16px;
+    border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
+/* ===== КОМПАКТНАЯ ШАПКА ===== */
 .profile-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 40px;
-    text-align: center;
+    padding: 24px 32px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
     color: white;
 }
 
 .profile-avatar {
-    width: 120px;
-    height: 120px;
-    margin: 0 auto 20px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
     overflow: hidden;
-    border: 5px solid white;
+    border: 3px solid white;
     display: flex;
     align-items: center;
     justify-content: center;
     background: rgba(255, 255, 255, 0.2);
+    flex-shrink: 0;
 }
 
 .profile-avatar img {
@@ -72,27 +70,60 @@ body {
 }
 
 .avatar-placeholder {
-    font-size: 48px;
+    font-size: 32px;
     font-weight: bold;
     color: white;
 }
 
-.profile-header h1 {
-    font-size: 28px;
-    margin-bottom: 10px;
+.profile-info {
+    flex: 1;
 }
 
-.profile-header p {
+/* Имя пользователя */
+.profile-info h1 {
+    font-size: 24px;
+    margin: 0 0 6px 0;
+    font-weight: 600;
+}
+
+/* Email - отдельная строка */
+.profile-email {
     font-size: 14px;
-    opacity: 0.9;
-    margin: 8px 0;
+    opacity: 0.85;
+    margin: 0 0 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
+.profile-email i {
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+/* Мета-информация в отдельной строке */
+.profile-meta {
+    display: flex;
+    gap: 16px;
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+.profile-meta span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.profile-meta i {
+    font-size: 11px;
+}
+
+/* ===== СТАТИСТИКА КОМПАКТНО ===== */
 .profile-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    padding: 30px 40px;
+    display: flex;
+    justify-content: space-around;
+    padding: 20px 32px;
     background: #f8f9fa;
     border-bottom: 1px solid #e9ecef;
 }
@@ -102,50 +133,63 @@ body {
 }
 
 .stat-card h3 {
-    font-size: 28px;
+    font-size: 24px;
     color: #667eea;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
 }
 
 .stat-card p {
-    font-size: 14px;
+    font-size: 13px;
     color: #6c757d;
 }
 
+/* ===== ФОРМА В ДВЕ КОЛОНКИ ===== */
 .profile-form {
-    padding: 40px;
+    padding: 28px 32px;
 }
 
 .profile-form h2 {
-    font-size: 22px;
-    margin-bottom: 30px;
+    font-size: 18px;
+    margin-bottom: 24px;
     color: #333;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 12px;
 }
 
 .profile-form h2 i {
     color: #667eea;
+    font-size: 18px;
 }
 
-.form-group {
-    margin-bottom: 25px;
+/* ДВЕ КОЛОНКИ */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 24px;
 }
 
-.form-group label {
+/* Стили для полей */
+.profile-form .form-group {
+    margin-bottom: 0;
+}
+
+.profile-form .form-group label {
     display: block;
-    margin-bottom: 10px;
+    margin-bottom: 6px;
     font-weight: 600;
     color: #333;
-    font-size: 14px;
+    font-size: 13px;
 }
 
-.form-group input,
-.form-group textarea,
-.form-group select {
+.profile-form .form-group input,
+.profile-form .form-group textarea,
+.profile-form .form-group select {
     width: 100%;
-    padding: 12px 15px;
+    padding: 10px 12px;
     border: 2px solid #e9ecef;
     border-radius: 8px;
     font-size: 14px;
@@ -153,83 +197,83 @@ body {
     font-family: inherit;
 }
 
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus {
+.profile-form .form-group input:focus,
+.profile-form .form-group textarea:focus,
+.profile-form .form-group select:focus {
     outline: none;
     border-color: #667eea;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-.form-group textarea {
+.profile-form .form-group textarea {
     resize: vertical;
-    min-height: 100px;
+    min-height: 80px;
 }
 
-.form-group small {
+.profile-form .form-group small {
     display: block;
-    margin-top: 8px;
+    margin-top: 4px;
     color: #6c757d;
-    font-size: 12px;
+    font-size: 11px;
 }
 
-.form-group .error {
+.profile-form .form-group .error {
     color: #dc3545;
-    font-size: 12px;
-    margin-top: 5px;
+    font-size: 11px;
+    margin-top: 4px;
 }
 
-.form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
+/* Полноширинные поля */
+.full-width {
+    grid-column: span 2;
 }
 
+/* Кнопки */
 .form-actions {
     display: flex;
-    gap: 15px;
-    margin-top: 30px;
-    padding-top: 30px;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 20px;
     border-top: 1px solid #e9ecef;
 }
 
 .btn-primary {
     flex: 1;
-    padding: 14px 30px;
+    padding: 12px 24px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s;
-    font-size: 15px;
+    font-size: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
 }
 
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
 }
 
 .btn-secondary {
     flex: 1;
-    padding: 14px 30px;
+    padding: 12px 24px;
     background: #e9ecef;
     color: #495057;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s;
-    font-size: 15px;
+    font-size: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
     text-decoration: none;
 }
 
@@ -238,22 +282,46 @@ body {
     transform: translateY(-2px);
 }
 
-@media (max-width: 600px) {
+/* ===== АДАПТИВНОСТЬ ===== */
+@media (max-width: 768px) {
     .profile-header {
-        padding: 30px 20px;
+        flex-direction: column;
+        text-align: center;
+        padding: 24px 20px;
+    }
+
+    .profile-info {
+        text-align: center;
+    }
+
+    .profile-email {
+        justify-content: center;
+    }
+
+    .profile-meta {
+        justify-content: center;
+        flex-wrap: wrap;
     }
 
     .profile-stats {
+        padding: 16px 20px;
+    }
+
+    .stat-card h3 {
+        font-size: 20px;
+    }
+
+    .form-grid {
         grid-template-columns: 1fr;
-        padding: 20px;
+        gap: 16px;
+    }
+
+    .full-width {
+        grid-column: span 1;
     }
 
     .profile-form {
         padding: 20px;
-    }
-
-    .form-row {
-        grid-template-columns: 1fr;
     }
 
     .form-actions {
@@ -261,3 +329,27 @@ body {
     }
 }
 
+@media (max-width: 480px) {
+    .profile-stats {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .profile-avatar {
+        width: 70px;
+        height: 70px;
+    }
+
+    .avatar-placeholder {
+        font-size: 28px;
+    }
+
+    .profile-info h1 {
+        font-size: 20px;
+    }
+
+    .profile-meta {
+        flex-direction: column;
+        gap: 6px;
+    }
+}

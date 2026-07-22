@@ -19,54 +19,23 @@
 @import url('./pages/auth.css');
 @import url('./pages/profile.css');
 @import url('./pages/planner.css');
+@import url('./pages/home.css');
 @import url('./pages/tasks.css');
 @import url('./pages/projects.css');
 @import url('./pages/project-detail.css');
-@import url('./pages/admin.css');
-@import url('./pages/home.css');
 @import url('./pages/contact.css');
-@import url('./pages/feedback.css');
 
 /* 5. Утилиты (всегда последними) */
 @import url('./utils/utilities.css');
 /* ===== ДОПОЛНИТЕЛЬНЫЕ ГЛОБАЛЬНЫЕ СТИЛИ ===== */
 
-/* Header и Footer */
-.header, .footer {
-    background-color: white;
-    border-bottom: 1px solid var(--gray-lighter);
-    padding: 1rem 0;
-}
+
 
 .header {
     box-shadow: var(--shadow-sm);
     position: sticky;
     top: 0;
     z-index: 100;
-}
-
-.footer {
-    margin-top: 3rem;
-    border-top: 1px solid var(--gray-lighter);
-    border-bottom: none;
-    padding: 2rem 0;
-    background-color: var(--light);
-}
-
-/* Навigation */
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-}
-
-.nav-links {
-    display: flex;
-    list-style: none;
-    gap: 2rem;
-    margin: 0;
-    padding: 0;
 }
 
 .nav-links a {
@@ -82,9 +51,9 @@
 
 /* Main content */
 .main-content {
-    flex: 1;
-    padding: 2rem;
-    min-height: calc(100vh - 200px);
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 30px 20px;
 }
 
 /* Сообщения */
@@ -249,7 +218,7 @@
     }
 
     .main-content {
-        padding: 1rem;
+        padding: 2rem;
     }
 
     .grid-cols-2,

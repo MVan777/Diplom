@@ -4,8 +4,7 @@ from tasks.models import Task
 from projects.models import Project
 
 class Comment(models.Model):
-    """Комментарий (для чата)"""
-    
+
     class CommentType(models.TextChoices):
         TASK = 'task', 'Комментарий к задаче'
         PROJECT = 'project', 'Комментарий к проекту'
@@ -16,12 +15,11 @@ class Comment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
-    # К чему привязан комментарий
+    # Привязка комментарий
     content_type = models.CharField(max_length=20, choices=CommentType.choices)
     task = models.ForeignKey(Task, on_delete=models.CASCADE, null=True, blank=True, related_name='comments')
     project = models.ForeignKey('projects.Project', on_delete=models.CASCADE, null=True, blank=True, related_name='comments')
     
-    # Вложения (опционально)
     attachment = models.FileField(upload_to='comment_attachments/', null=True, blank=True)
     
     class Meta:

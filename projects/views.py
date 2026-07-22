@@ -8,29 +8,23 @@ from .models import Project, ProjectMembership
 from django.apps import apps
 Task = apps.get_model('tasks', 'Task')
 Comment = apps.get_model('comments', 'Comment')
-
-from django.db.models import Count, Q, Case, When, IntegerField, Sum
-from django.db.models.functions import Coalesce
-
-
 from django.db.models import Count, Q
 
 @login_required
 def project_list(request):
-    """Список всех проектов пользователя"""
 
     # Проекты, где пользователь владелец
     owned_projects = Project.objects.filter(owner=request.user).annotate(
         total_tasks=Count('project_tasks'),
-        completed_tasks=Count('project_tasks', filter=Q(project_tasks__is_completed=True))  # ✅ ИСПРАВЛЕНО
+        completed_tasks=Count('project_tasks', filter=Q(project_tasks__is_completed=True))
     ).prefetch_related('members')
 
     # Проекты, где пользователь участник
     member_projects = Project.objects.filter(members=request.user).exclude(
         owner=request.user
     ).annotate(
-        total_tasks=Count('project_tasks'),  # ✅ ИСПРАВЛЕНО
-        completed_tasks=Count('project_tasks', filter=Q(project_tasks__is_completed=True))  # ✅ ИСПРАВЛЕНО
+        total_tasks=Count('project_tasks'),
+        completed_tasks=Count('project_tasks', filter=Q(project_tasks__is_completed=True))
     ).prefetch_related('members')
 
     context = {
@@ -41,9 +35,10 @@ def project_list(request):
 
     return render(request, 'projects/project_list.html', context)
 
+
 @login_required
 def project_detail(request, project_id):
-    """Детали проекта с задачами"""
+    """Детали проекта с задачами и чатом"""
     project = get_object_or_404(Project, id=project_id)
 
     # Проверка доступа
@@ -51,33 +46,44 @@ def project_detail(request, project_id):
         messages.error(request, 'У вас нет доступа к этому проекту')
         return redirect('projects:list')
 
-    # ✅ ИСПРАВЛЕНО: используем tasks (прямое поле)
+    if request.method == 'POST':
+        text = request.POST.get('text', '').strip()
+        if text:
+            Comment.objects.create(
+                author=request.user,
+                text=text,
+                content_type='project',
+                project=project
+            )
+            messages.success(request, '💬 Сообщение отправлено!')
+        return redirect('projects:detail', project_id=project.id)
+
+
     tasks = project.project_tasks.all()
     members = project.members.all()
+    comments = Comment.objects.filter(
+        content_type='project',
+        project=project
+    ).select_related('author').order_by('created_at')
 
     # Статистика выполнения
     total_tasks = tasks.count()
     completed_tasks = tasks.filter(is_completed=True).count()
 
-    completion_percentage = 0
-    if total_tasks > 0:
-        completion_percentage = int((completed_tasks / total_tasks) * 100)
-
     context = {
+        'comments': comments,
         'project': project,
         'tasks': tasks,
         'members': members,
         'is_owner': request.user == project.owner,
         'total_tasks': total_tasks,
         'completed_tasks': completed_tasks,
-        'completion_percentage': completion_percentage,
     }
     return render(request, 'projects/project_detail.html', context)
 
 
 @login_required
 def create_project(request):
-    """Создать новый проект"""
     if request.method == 'POST':
         name = request.POST.get('name', '').strip()
         description = request.POST.get('description', '').strip()
@@ -107,7 +113,6 @@ def create_project(request):
 
 @login_required
 def edit_project(request, project_id):
-    """Редактировать проект (только для владельца)"""
     project = get_object_or_404(Project, id=project_id, owner=request.user)
     
     if request.method == 'POST':
@@ -124,7 +129,6 @@ def edit_project(request, project_id):
 
 @login_required
 def delete_project(request, project_id):
-    """Удалить проект (только для владельца)"""
     project = get_object_or_404(Project, id=project_id, owner=request.user)
     
     if request.method == 'POST':
@@ -139,7 +143,6 @@ def delete_project(request, project_id):
 
 @login_required
 def add_member(request, project_id):
-    """Добавить участника в проект"""
     project = get_object_or_404(Project, id=project_id, owner=request.user)
     
     if request.method == 'POST':
@@ -169,7 +172,6 @@ def add_member(request, project_id):
 
 @login_required
 def remove_member(request, project_id, user_id):
-    """Удалить участника из проекта"""
     project = get_object_or_404(Project, id=project_id, owner=request.user)
     user = get_object_or_404(User, id=user_id)
     
@@ -184,7 +186,6 @@ def remove_member(request, project_id, user_id):
 
 @login_required
 def project_chat(request, project_id):
-    """Чат проекта"""
     project = get_object_or_404(Project, id=project_id)
     
     if not project.members.filter(id=request.user.id).exists():

@@ -14,8 +14,8 @@
 .project-hero {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border-radius: 20px;
-    padding: 40px;
-    margin-bottom: 30px;
+    padding: 20px;
+    margin-bottom: 10px;
     color: white;
     display: flex;
     justify-content: space-between;
@@ -79,11 +79,28 @@
 
 .project-hero__actions {
     display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+}
+
+.project-hero__buttons {
+    display: flex;
     gap: 10px;
 }
 
+.project-hero__meta {
+    display: flex;
+    gap: 15px;
+    font-size: 0.85rem;
+    opacity: 0.8;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 8px 15px;
+    border-radius: 12px;
+}
+
 .hero-btn {
-    padding: 12px 24px;
+    padding: 3px 10px;
     border-radius: 12px;
     font-weight: 600;
     text-decoration: none;
@@ -118,15 +135,15 @@
 /* ===== СТАТИСТИКА ПЛИТКАМИ ===== */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-    margin-bottom: 30px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+    margin-bottom: 10px;
 }
 
-.project-stat-card {  /* БЫЛО: .stat-card */
+.project-stat-card {
     background: white;
     border-radius: 16px;
-    padding: 25px;
+    padding: 7px;
     display: flex;
     align-items: center;
     gap: 20px;
@@ -140,25 +157,24 @@
 }
 
 .project-stat-card--tasks {
-    border-left: 4px solid #667eea;
+    border: 2px solid #667eea;
 }
 
-
 .stat-card--completed {
-    border-left: 4px solid #10b981;
+    border: 2px solid #10b981;
 }
 
 .stat-card--members {
-    border-left: 4px solid #f59e0b;
+    border: 2px solid #f59e0b;
 }
 
 .stat-card--progress {
-    border-left: 4px solid #ec4899;
+    border: 2px solid #ec4899;
 }
 
 .stat-card__icon {
-    width: 60px;
-    height: 60px;
+    width: 40px;
+    height: 40px;
     background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
     border-radius: 50%;
     display: flex;
@@ -167,7 +183,7 @@
     font-size: 1.8rem;
 }
 
-.stat-card--tasks .stat-card__icon { color: #667eea; }
+.project-stat-card--tasks .stat-card__icon { color: #667eea; }
 .stat-card--completed .stat-card__icon { color: #10b981; }
 .stat-card--members .stat-card__icon { color: #f59e0b; }
 .stat-card--progress .stat-card__icon { color: #ec4899; }
@@ -225,8 +241,8 @@
     color: #667eea;
 }
 
-/* ===== КНОПКИ ===== */
-.btn {
+/* ===== СПЕЦИФИЧНЫЕ КНОПКИ ДЛЯ ПРОЕКТА ===== */
+.btn--primary {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -238,9 +254,6 @@
     border: none;
     cursor: pointer;
     font-size: 0.95rem;
-}
-
-.btn--primary {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
@@ -248,10 +261,22 @@
 
 .btn--primary:hover {
     transform: translateY(-2px);
+    color: white;
     box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
 }
 
 .btn--secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    font-size: 0.95rem;
     background: #f8f9fa;
     color: #333;
 }
@@ -282,21 +307,42 @@
     padding: 20px;
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
     gap: 15px;
     transition: all 0.3s ease;
-    border-left: 4px solid #667eea;
+    border-color: 4px solid #667eea;
+}
+
+.task-card__right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+}
+
+.task-card__actions {
+    display: flex;
+    gap: 8px;
 }
 
 .task-card--completed {
-    opacity: 0.8;
-    border-left-color: #10b981;
-    background: linear-gradient(to right, #f8f9fa, #f0fdf4);
+    background: linear-gradient(to right, #e9e9e9, #29f7685e);
+}
+.task-card--completed:hover {
+    box-shadow: 0 4px 12px #10b981;
+}
+
+.task-card--no_completed {
+    background: linear-gradient(to right, #e9e9e9, #f5002c5e);
+
+}
+.task-card--no_completed:hover {
+    box-shadow: 0 4px 12px red;
 }
 
 .task-card:hover {
     transform: translateX(5px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+
 }
 
 .task-card__content {
@@ -357,10 +403,12 @@
 }
 
 .task-card__meta {
-    display: flex;
-    gap: 20px;
-    font-size: 0.85rem;
+display: flex;
+    gap: 12px;
+    font-size: 0.8rem;
     color: #666;
+    flex-wrap: wrap;
+    justify-content: flex-end;
 }
 
 .task-card__deadline i {
@@ -414,12 +462,23 @@
 }
 
 .task-action--complete {
+    color: #ffff;
+    background: #10b981;
+}
+
+.task-action--no_complete {
     color: #10b981;
 }
 
-.task-action--complete:hover {
+.task-action--no_complete:hover {
     background: #10b981;
     color: white;
+    transform: translateY(-2px);
+}
+
+.task-action--complete:hover {
+    background: #ffff;
+    color: #10b981;
     transform: translateY(-2px);
 }
 
@@ -541,7 +600,7 @@
     color: #ef4444;
     text-decoration: none;
     padding: 5px;
-    border-radius: 50%;
+    border-radius: 10px;
     transition: all 0.3s;
 }
 
@@ -728,8 +787,163 @@
 }
 
 .project-hero,
-.stat-card,
+.project-stat-card,
 .section-card,
 .sidebar-card {
     animation: slideIn 0.3s ease forwards;
+}
+
+/* ===== ЧАТ ПРОЕКТА (внизу страницы) ===== */
+.project-chat-section {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-top: 40px;
+}
+
+.project-chat-section .chat-section__header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.project-chat-section .chat-section__title {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.3rem;
+}
+
+.chat-project-name {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 0.9rem;
+}
+
+.project-chat-section .chat-messages-container {
+    height: 400px;
+    overflow-y: auto;
+    padding: 20px;
+    background: #f8f9fa;
+}
+
+.project-chat-section .chat-messages {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.project-chat-section .chat-message {
+    background: white;
+    border-radius: 12px;
+    padding: 12px 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.project-chat-section .chat-message__header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.project-chat-section .chat-message__author {
+    font-weight: 600;
+    color: #667eea;
+}
+
+.project-chat-section .chat-message__time {
+    font-size: 0.75rem;
+    color: #999;
+}
+
+.project-chat-section .chat-message__text {
+    margin: 0;
+    color: #333;
+    line-height: 1.5;
+}
+
+.project-chat-section .empty-messages {
+    text-align: center;
+    padding: 60px;
+    color: #999;
+}
+
+.project-chat-section .empty-icon {
+    font-size: 3rem;
+    margin-bottom: 10px;
+    color: #ddd;
+}
+
+.project-chat-section .chat-form {
+    display: flex;
+    gap: 15px;
+    padding: 20px;
+    background: white;
+    border-top: 1px solid #e0e0e0;
+}
+
+.project-chat-section .chat-form textarea {
+    flex: 1;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 0.95rem;
+    resize: none;
+    height: 60px;
+    font-family: inherit;
+}
+
+.project-chat-section .chat-form textarea:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.project-chat-section .form-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.project-chat-section .btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 0 25px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.project-chat-section .btn-primary:hover {
+    transform: translateY(-2px);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .project-chat-section .chat-section__header {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+
+    .project-chat-section .chat-form {
+        flex-direction: column;
+    }
+
+    .project-chat-section .form-actions {
+        justify-content: flex-end;
+    }
+
+    .project-chat-section .btn-primary {
+        padding: 12px 20px;
+        justify-content: center;
+    }
 }

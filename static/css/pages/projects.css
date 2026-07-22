@@ -1,7 +1,7 @@
 /* projects.css - стили для страницы проектов */
 
 .projects-layout {
-    max-width: 1400px;
+    max-width: 1200px;
     margin: 0 auto;
     padding: 30px 20px;
 }
@@ -11,6 +11,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-radius: 7px;
     margin-bottom: 40px;
     flex-wrap: wrap;
     gap: 20px;
@@ -63,8 +64,8 @@
     color: #666;
 }
 
-/* ===== КНОПКИ ===== */
-.btn {
+/* ===== КНОПКИ ДЛЯ СТРАНИЦЫ ПРОЕКТОВ ===== */
+.project-btn--primary {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -76,15 +77,12 @@
     border: none;
     cursor: pointer;
     font-size: 0.95rem;
-}
-
-.project-btn--primary {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
 
-project-.btn--primary:hover {
+.project-btn--primary:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
 }
@@ -136,6 +134,7 @@ project-.btn--primary:hover {
 /* ===== СЕКЦИИ ПРОЕКТОВ ===== */
 .projects-section {
     margin-bottom: 50px;
+    padding: 10px;
 }
 
 .projects-section:last-child {
@@ -173,21 +172,21 @@ project-.btn--primary:hover {
 
 /* ===== СЕТКА ПРОЕКТОВ ===== */
 .projects-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 /* ===== КАРТОЧКА ПРОЕКТА ===== */
 .project-card {
     background: white;
     border-radius: 16px;
-    padding: 25px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    padding: 10px;
+    box-shadow: 0 5px 20px rgb(166 166 166);
     transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 7px;
     position: relative;
     overflow: hidden;
 }
@@ -205,7 +204,6 @@ project-.btn--primary:hover {
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, #667eea, #764ba2);
 }
 
 .project-card--member::before {
@@ -215,7 +213,6 @@ project-.btn--primary:hover {
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, #43e97b, #38f9d7);
 }
 
 .project-card__header {
@@ -266,7 +263,7 @@ project-.btn--primary:hover {
     gap: 5px;
     background: #f0f0f0;
     padding: 4px 10px;
-    border-radius: 20px;
+    border-radius: 30px;
     white-space: nowrap;
 }
 
@@ -278,7 +275,7 @@ project-.btn--primary:hover {
     color: #666;
     line-height: 1.6;
     font-size: 0.95rem;
-    min-height: 60px;
+    min-height: 30px;
 }
 
 .project-card__description--empty {
@@ -290,7 +287,7 @@ project-.btn--primary:hover {
 .project-card__stats {
     display: flex;
     gap: 20px;
-    margin: 10px 0;
+    margin: 5px 0;
 }
 
 .project-stat {
@@ -398,7 +395,7 @@ project-.btn--primary:hover {
 
     .project-card__stats {
         flex-direction: column;
-        gap: 10px;
+        gap: 20px;
     }
 
     .project-stat {

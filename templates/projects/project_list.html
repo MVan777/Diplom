@@ -58,7 +58,6 @@
     {% else %}
 
     <!-- Мои проекты (как владелец) -->
-    <!-- Мои проекты (как владелец) -->
 {% if owned_projects %}
 <section class="projects-section">
     <div class="projects-section__header">
@@ -71,40 +70,38 @@
 
     <div class="projects-grid">
         {% for project in owned_projects %}
-        <div class="project-card project-card--owner">
+        <div class="project-card project-card--owner" onclick="location.href='{% url 'projects:detail' project.id %}'" style="cursor: pointer;">
             <div class="project-card__header">
                 <h3 class="project-card__title">
                     <a href="{% url 'projects:detail' project.id %}">{{ project.name }}</a>
                 </h3>
                 <div class="project-card__badge">
+                    <div class="project-stat">
+                        <i class="fas fa-tasks project-stat__icon"></i>
+                        <div class="project-stat__content">
+                            <span class="project-stat__value">{{ project.project_tasks.count }}</span>
+                            <span class="project-stat__label">задач</span>
+                        </div>
+                    </div>
+                    <div class="project-stat">
+                        <i class="fas fa-users project-stat__icon"></i>
+                        <div class="project-stat__content">
+                            <span class="project-stat__value">{{ project.members.count }}</span>
+                            <span class="project-stat__label">участников</span>
+                        </div>
+                    </div>
                     <i class="fas fa-crown"></i>
-                    Владелец
+                    <span>Владелец</span>
                 </div>
+
             </div>
 
             <div class="project-card__description">
                 {% if project.description %}
-                    {{ project.description|truncatechars:100 }}
+                    {{ project.description|truncatechars:50 }}
                 {% else %}
                     <span class="project-card__description--empty">Нет описания</span>
                 {% endif %}
-            </div>
-
-            <div class="project-card__stats">
-                <div class="project-stat">
-                    <i class="fas fa-tasks project-stat__icon"></i>
-                    <div class="project-stat__content">
-                        <span class="project-stat__value">{{ project.project_tasks.count }}</span>
-                        <span class="project-stat__label">задач</span>
-                    </div>
-                </div>
-                <div class="project-stat">
-                    <i class="fas fa-users project-stat__icon"></i>
-                    <div class="project-stat__content">
-                        <span class="project-stat__value">{{ project.members.count }}</span>
-                        <span class="project-stat__label">участников</span>
-                    </div>
-                </div>
             </div>
 
             <!-- Прогресс выполнения -->
@@ -137,14 +134,31 @@
         <div class="projects-grid">
             <!-- ❗ ИСПРАВЛЕНО: меняем owned_projects на member_projects -->
             {% for project in member_projects %}
-            <div class="project-card project-card--member">
+            <div class="project-card project-card--member" onclick="location.href='{% url 'projects:detail' project.id %}'" style="cursor: pointer;">
                 <div class="project-card__header">
                     <h3 class="project-card__title">
                         <a href="{% url 'projects:detail' project.id %}">{{ project.name }}</a>
                     </h3>
                     <div class="project-card__owner">
+                        <div class="project-card__stats">
+                            <div class="project-stat">
+                                <i class="fas fa-tasks project-stat__icon"></i>
+                                <div class="project-stat__content">
+                                    <span class="project-stat__value">{{ project.project_tasks.count }}</span>
+                                    <span class="project-stat__label">задач</span>
+                                </div>
+                            </div>
+
+                            <div class="project-stat">
+                                <i class="fas fa-users project-stat__icon"></i>
+                                <div class="project-stat__content">
+                                    <span class="project-stat__value">{{ project.members.count }}</span>
+                                    <span class="project-stat__label">участников</span>
+                                </div>
+                            </div>
+                        </div>
                         <i class="fas fa-user"></i>
-                        {{ project.owner.username }}
+                        <span>{{ project.owner.username }}</span>
                     </div>
                 </div>
 
@@ -154,24 +168,6 @@
                     {% else %}
                         <span class="project-card__description--empty">Нет описания</span>
                     {% endif %}
-                </div>
-
-                <div class="project-card__stats">
-                    <div class="project-stat">
-                        <i class="fas fa-tasks project-stat__icon"></i>
-                        <div class="project-stat__content">
-                            <span class="project-stat__value">{{ project.project_tasks.count }}</span>
-                            <span class="project-stat__label">задач</span>
-                        </div>
-                    </div>
-
-                    <div class="project-stat">
-                        <i class="fas fa-users project-stat__icon"></i>
-                        <div class="project-stat__content">
-                            <span class="project-stat__value">{{ project.members.count }}</span>
-                            <span class="project-stat__label">участников</span>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- Прогресс выполнения для проектов-участия -->
@@ -185,9 +181,9 @@
                     {% endif %}
 
                 <!-- Роль в проекте -->
-                <div class="project-card__footer">
-                    <span class="project-card__role">Участник</span>
-                </div>
+<!--                <div class="project-card__footer">-->
+<!--                    <span class="project-card__role">Участник</span>-->
+<!--                </div>-->
             </div>
             {% endfor %}
         </div>

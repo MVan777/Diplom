@@ -6,168 +6,174 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/pages/tasks.css' %}">
 {% endblock %}
+
 {% block content %}
-    <div class="app-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-
-                <div class="user-info">
-                    <div class="user-avatar">
-                        {{ request.user.username|slice:":1"|upper }}
-                    </div>
-                    <div>
-                        <div class="user-name">{{ request.user.username }}</div>
-                        <div class="user-email">{{ request.user.email|default:"user@smartplanner.com" }}</div>
-                    </div>
+<div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar_task">
+        <div class="sidebar-header">
+            <div class="user-info">
+                <div class="user-avatar">
+                    {{ request.user.username|slice:":1"|upper }}
+                </div>
+                <div>
+                    <div class="user-name">{{ request.user.username }}</div>
+                    <div class="user-email">{{ request.user.email|default:"user@smartplanner.com" }}</div>
                 </div>
             </div>
+        </div>
 
-            <nav class="nav-menu">
-                <a href="{% url 'tasks:planner' %}" class="nav-item">
-                    <i class="fas fa-th-large"></i>
-                    <span>Планировщик</span>
-                </a>
-                <a href="{% url 'tasks:task_filter' %}" class="nav-item active">
-                    <i class="fas fa-list"></i>
-                    <span>Все задачи</span>
-                </a>
-            </nav>
+        <nav class="nav-menu">
+            <a href="{% url 'tasks:planner' %}" class="nav-item">
+                <i class="fas fa-th-large"></i>
+                <span>Планировщик</span>
+            </a>
+            <a href="{% url 'tasks:task_filter' %}" class="nav-item active">
+                <i class="fas fa-list"></i>
+                <span>Все задачи</span>
+            </a>
+        </nav>
 
-            <div class="sidebar-footer">
-                <a href="{% url 'users:logout' %}" class="nav-item">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Выход</span>
-                </a>
-            </div>
-        </aside>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Top Bar -->
-            <div class="top-bar">
-                <h1 class="page-title">
-                    <i class="fas fa-list"></i>
-                    Все задачи
-                </h1>
-                <div class="top-actions">
-                    <a href="{% url 'tasks:planner' %}" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left"></i> Вернуться
-                    </a>
-                    <a href="{% url 'users:user_profile' %}" class="btn btn-profile" title="Мой профиль">
-                        <i class="fas fa-user-circle"></i>
-                    </a>
-                </div>
-            </div>
+    </aside>
 
-            <!-- Content -->
-            <div class="dashboard-panel">
-                <!-- Filters -->
-                <div >
-                    <h3 ><i class="fas fa-filter"></i> Фильтры</h3>
-                    <form method="get" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; align-items: flex-end;">
-                        <div class="form-group" style="margin: 0;">
-                            <label style="font-weight: 600; margin-bottom: 5px; display: block;">Поиск:</label>
-                            {{ filter_form.search }}
-                        </div>
-                        <!-- В блоке фильтров, после поля sort -->
-                        <div class="form-group">
-                            <label style="font-weight: 600; margin-bottom: 5px; display: block;">Проект:</label>
-                            <select name="project" class="form-select">
-                                <option value="">Все проекты</option>
-                                {% for project in user_projects %}
-                                    <option value="{{ project.id }}" {% if request.GET.project == project.id|stringformat:"s" %}selected{% endif %}>
-                                        {{ project.name }}
-                                    </option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="form-group" style="margin: 0;">
-                            <label style="font-weight: 600; margin-bottom: 5px; display: block;">Приоритет:</label>
-                            {{ filter_form.priority }}
-                        </div>
-                        <div class="form-group" style="margin: 0;">
-                            <label style="font-weight: 600; margin-bottom: 5px; display: block;">Статус:</label>
-                            {{ filter_form.status }}
-                        </div>
-                        <div class="form-group" style="margin: 0;">
-                            <label style="font-weight: 600; margin-bottom: 5px; display: block;">Сортировка:</label>
-                            {{ filter_form.sort }}
-                        </div>
-                        <div style="display: flex; gap: 10px;">
-                            <button type="submit" class="btn btn-primary" style="margin: 0;">
-                                <i class="fas fa-search"></i> Поиск
-                            </button>
-                            <a href="{% url 'tasks:task_filter' %}" class="btn btn-secondary" style="margin: 0; text-decoration: none;">
-                                <i class="fas fa-redo"></i> Сброс
-                            </a>
-                        </div>
-                    </form>
-                </div>
+    <!-- Main Content -->
+    <main class="main-content-dash">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <h1 class="page-title">
+                <i class="fas fa-list"></i>
+                Все задачи
+            </h1>
 
+            <div class="top-actions">
                 <!-- Stats -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px;">
-                    <div style="background: white; padding: 15px; border-radius: 8px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                        <div style="font-size: 24px; font-weight: bold; color: #4dabf7;">{{ total_count }}</div>
-                        <div style="font-size: 12px; color: #666;">Всего найдено</div>
-                    </div>
+                <div class="stats-card-tasks">
+                    <div class="stats-number">{{ total_count }}</div>
+                    <div class="stats-label">Всего найдено</div>
                 </div>
+                <a href="{% url 'tasks:planner' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Вернуться
+                </a>
+                <a href="{% url 'users:user_profile' %}" class="btn btn-profile" title="Мой профиль">
+                    <i class="fas fa-user-circle"></i>
+                </a>
+            </div>
+        </div>
 
-                <!-- Tasks List -->
-                <div style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                    {% if tasks %}
-                        {% for task in tasks %}
-                            <div style="padding: 20px; border-bottom: 1px solid #f0f0f0; transition: all 0.2s;">
-                                <div style="display: flex; justify-content: space-between; align-items: start;">
-                                    <div style="flex: 1;">
-                                        <h3 style="margin: 0 0 10px 0;">
-                                            <a href="{% url 'tasks:task_detail' task.pk %}" style="color: #333; text-decoration: none;">
-                                                {{ task.title }}
-                                            </a>
-                                            {% if task.priority == 'urgent' %}
-                                                <span style="background: #dc3545; color: white; padding: 3px 8px; border-radius: 4px; font-size: 11px; margin-left: 10px;">🔴 Срочный</span>
-                                            {% elif task.priority == 'average' %}
-                                                <span style="background: #ffc107; color: white; padding: 3px 8px; border-radius: 4px; font-size: 11px; margin-left: 10px;">🟡 Средний</span>
-                                            {% else %}
-                                                <span style="background: #28a745; color: white; padding: 3px 8px; border-radius: 4px; font-size: 11px; margin-left: 10px;">🟢 Обычный</span>
-                                            {% endif %}
-                                        </h3>
-                                        {% if task.description %}
-                                            <p style="margin: 5px 0; color: #666; font-size: 13px;">{{ task.description|truncatechars:100 }}</p>
+        <!-- Content -->
+        <div class="dashboard-panel">
+            <!-- Filters -->
+            <div class="filter-form">
+                <h3><i class="fas fa-filter"></i> Фильтры</h3>
+                <form method="get">
+                    <div class="form-group">
+                        <label>Поиск:</label>
+                        {{ filter_form.search }}
+                    </div>
+                    <div class="form-group">
+                        <label>Проект:</label>
+                        <select name="project" class="form-select">
+                            <option value="">Все проекты</option>
+                            {% for project in project_tasks %}
+                                <option value="{{ project.id }}" {% if request.GET.project == project.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ project.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Приоритет:</label>
+                        {{ filter_form.priority }}
+                    </div>
+                    <div class="form-group">
+                        <label>Статус:</label>
+                        {{ filter_form.status }}
+                    </div>
+                    <div class="form-group">
+                        <label>Сортировка:</label>
+                        {{ filter_form.sort }}
+                    </div>
+                    <div class="filter-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Поиск
+                        </button>
+                        <a href="{% url 'tasks:task_filter' %}" class="btn btn-secondary">
+                            <i class="fas fa-redo"></i> Сброс
+                        </a>
+
+                    </div>
+
+                </form>
+            </div>
+
+            <!-- Tasks List -->
+            <div class="tasks-list-container">
+                {% if tasks %}
+                    {% for task in tasks %}
+                        <div class="task-item">
+                            <div class="task-row">
+                                <div class="task-info">
+                                    <h3 class="task-title">
+                                        <a href="{% url 'tasks:task_detail' task.pk %}">
+                                            {{ task.title }}
+                                        </a>
+                                        {% if task.priority == 'urgent' %}
+                                            <span class="priority-urgent">🔴 Срочный</span>
+                                        {% elif task.priority == 'average' %}
+                                            <span class="priority-average">🟡 Средний</span>
+                                        {% else %}
+                                            <span class="priority-ordinary">🟢 Обычный</span>
                                         {% endif %}
-                                        <small style="color: #999;">
-                                            <i class="fas fa-clock"></i> {{ task.deadline|date:"d.m.Y H:i" }}
-                                            {% if task.is_completed %}
-                                                | <span style="color: #28a745;"><i class="fas fa-check-circle"></i> Выполнено</span>
+                                    </h3>
+                                    {% if task.description %}
+                                        <p class="task-description">{{ task.description|truncatechars:100 }}</p>
+                                    {% endif %}
+                                    <div class="task-meta">
+                                        <i class="fas fa-clock"></i> {{ task.deadline|date:"d.m.Y H:i" }}
+
+                                        {% if task.is_completed %}
+                                            {% if task.deadline < task.completed_at %}
+                                                | <span class="status-overdue"><i class="fas fa-check-circle"></i> Просрочен</span>
                                             {% else %}
-                                                | <span style="color: #ffc107;"><i class="fas fa-spinner"></i> В работе</span>
+                                                | <span class="status-deadline"><i class="fas fa-check-circle"></i> Дедлайн</span>
                                             {% endif %}
-                                        </small>
-                                    </div>
-                                    <div style="display: flex; gap: 5px; margin-left: 15px;">
-                                        <a href="{% url 'tasks:edit_task' task.pk %}" class="btn btn-secondary" style="padding: 8px 12px; font-size: 12px; margin: 0;">✎</a>
-                                        <form method="post" action="{% url 'tasks:complete_task' task.pk %}" style="display: inline;">
-                                            {% csrf_token %}
-                                            <button type="submit" class="btn btn-success" style="padding: 8px 12px; font-size: 12px; margin: 0;">✓</button>
-                                        </form>
-                                        <form method="post" action="{% url 'tasks:delete_task' task.pk %}" style="display: inline;" onsubmit="return confirm('Удалить задачу?');">
-                                            {% csrf_token %}
-                                            <button type="submit" class="btn btn-danger" style="padding: 8px 12px; font-size: 12px; margin: 0;">🗑</button>
-                                        </form>
+
+                                            <br><i class="fas fa-clock"></i> {{ task.completed_at|date:"d.m.Y H:i" }}
+                                            | <span class="status-completed"><i class="fas fa-check-circle"></i> Завершено</span>
+
+                                        {% elif task.status == 'in_progress' %}
+                                            | <span class="status-in-progress"><i class="fas fa-spinner"></i> В работе</span>
+                                            {% if task.started_at %}
+                                                <br><i class="fas fa-clock"></i> {{ task.started_at|date:"d.m.Y H:i" }}
+                                                | <span class="status-started"><i class="fas fa-play-circle"></i> Запущена</span>
+                                            {% endif %}
+                                        {% endif %}
                                     </div>
                                 </div>
+                                <div class="task-actions">
+                                    <a href="{% url 'tasks:edit_task' task.pk %}" class="btn btn-secondary">✎</a>
+                                    <form method="post" action="{% url 'tasks:complete_task' task.pk %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-success">✓</button>
+                                    </form>
+                                    <form method="post" action="{% url 'tasks:delete_task' task.pk %}" onsubmit="return confirm('Удалить задачу?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger">🗑</button>
+                                    </form>
+                                </div>
                             </div>
-                        {% endfor %}
-                    {% else %}
-                        <div style="padding: 40px; text-align: center; color: #999;">
-                            <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 15px; opacity: 0.5;"></i>
-                            <p>Задачи не найдены</p>
-                            <small>Попробуйте изменить параметры фильтрации или создайте новую задачу</small>
                         </div>
-                    {% endif %}
-                </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p>Задачи не найдены</p>
+                        <small>Попробуйте изменить параметры фильтрации или создайте новую задачу</small>
+                    </div>
+                {% endif %}
             </div>
-        </main>
-    </div>
-
+        </div>
+    </main>
+</div>
 {% endblock %}

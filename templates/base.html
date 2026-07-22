@@ -92,28 +92,10 @@
         const navLinks = document.querySelector('.nav-links');
         const authButtons = document.querySelector('.auth-buttons');
 
-        if (mobileMenuBtn && navLinks && authButtons) {
+       if (mobileMenuBtn) {
             mobileMenuBtn.addEventListener('click', () => {
-                const isVisible = navLinks.style.display === 'flex';
-                navLinks.style.display = isVisible ? 'none' : 'flex';
-                authButtons.style.display = isVisible ? 'none' : 'flex';
-
-                if (!isVisible) {
-                    navLinks.style.flexDirection = 'column';
-                    navLinks.style.position = 'absolute';
-                    navLinks.style.top = '100%';
-                    navLinks.style.left = '0';
-                    navLinks.style.right = '0';
-                    navLinks.style.background = 'white';
-                    navLinks.style.padding = '20px';
-                    navLinks.style.boxShadow = '0 10px 20px rgba(0,0,0,0.1)';
-
-                    authButtons.style.flexDirection = 'column';
-                    authButtons.style.position = 'absolute';
-                    authButtons.style.top = 'calc(100% + 200px)';
-                    authButtons.style.left = '20px';
-                    authButtons.style.right = '20px';
-                }
+                navLinks.classList.toggle('show');
+                authButtons.classList.toggle('show');
             });
         }
 

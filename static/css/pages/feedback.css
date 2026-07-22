@@ -1,14 +1,4 @@
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0; /* ДОБАВИЛ: сброс марджинов */
-    padding: 20px; /* ДОБАВИЛ: отступ для мобильных */
-    box-sizing: border-box; /* ДОБАВИЛ: правильный расчет размеров */
-}
+
 
 .login-container {
     background: white;

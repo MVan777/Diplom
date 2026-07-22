@@ -18,7 +18,15 @@
                 </a>
                 <div class="user-info">
                     <div class="user-avatar">
-                        {{ request.user.username|slice:":1"|upper }}
+                        <div class="profile-avatar">
+                            {% if profile.avatar %}
+                                <img src="{{ profile.avatar.url }}" alt="Аватар {{ user.username }}">
+                            {% else %}
+                                <div class="avatar-placeholder">
+                                    {{ user.username|first|upper }}
+                                </div>
+                            {% endif %}
+                        </div>
                     </div>
                     <div>
                         <div class="user-name">{{ request.user.username }}</div>
@@ -44,10 +52,6 @@
                     <i class="fas fa-folder"></i>
                     <span>Проекты</span>
                 </a>
-                <a href="{% url 'users:user_profile' %}" class="nav-item">
-                    <i class="fas fa-user-circle"></i>
-                    <span>Профиль</span>
-                </a>
                 
             </nav>
 
@@ -59,8 +63,10 @@
             </div>
         </aside>
 
+
         <!-- Main Content -->
-        <main class="main-content">
+        clear<main class="main-content_p">
+
             <!-- Top Bar -->
             <div class="top-bar">
                 <h1 class="page-title">
@@ -125,167 +131,526 @@
                         </div>
                     </div>
                 </div>
+                <!--Проекты сворачиваемый блок-->
+                <div class="projects-section">
+                    <div class="projects-header" onclick="toggleProjects()">
+                        <div class="projects-header-left">
+                            <i class="fas fa-folder-open"></i>
+                            <h2>Мои проекты</h2>
+                            <span class="projects-count">{{ active_projects|length }}</span>
+                        </div>
+                        <i class="fas fa-chevron-down" id="projectsToggleIcon"></i>
+                    </div>
 
-                <!-- Priority Board -->
-                <div class="priority-board">
-                    <div class="board-header">
-                        <h2 class="board-title">
-                            <i class="fas fa-columns"></i> Задачи по приоритетам
-                        </h2>
-                        <div class="view-options">
-                            <button class="btn btn-primary" id="addMultipleBtn">
-                                <i class="fas fa-layer-group"></i> Несколько задач
-                            </button>
+                    <div class="projects-content" id="projectsContent">
+                        <!-- Активные проекты (по умолчанию 3) -->
+                        <div class="active-projects">
+                            <h3 class="projects-subtitle">
+                                <i class="fas fa-star" style="color: #ffc107;"></i>
+                                Активные проекты
+                            </h3>
+                            <div class="projects-grid">
+                                {% for project in active_projects|slice:":3" %}
+                                <div class="project-mini-card">
+                                    <div class="project-mini-header">
+                                        <h4 class="project-mini-title">
+                                            <a href="{% url 'tasks:project_planner' project.id %}">{{ project.name }}</a>
+                                        </h4>
+                                        <span class="project-owner-badge">
+                                            <i class="fas fa-crown" style="color: #ffc107; font-size: 12px;"></i>
+                                            {{ project.owner.username }}
+                                        </span>
+                                    </div>
+
+                                    <!-- Статистика задач проекта -->
+                                    <div class="project-mini-stats">
+                                        <div class="project-mini-stat">
+                                            <i class="fas fa-tasks"></i>
+                                            <span>{{ project.project_tasks.count }} задач</span>
+                                        </div>
+                                        <div class="project-mini-stat">
+                                            <i class="fas fa-users"></i>
+                                            <span>{{ project.members.count }} участников</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Прогресс проекта -->
+                                    {% if project.total_tasks > 0 %}
+                                    <div class="project-mini-progress">
+                                        <div class="progress-mini-bar">
+                                            <div class="progress-mini-fill" style="width: {% widthratio project.completed_tasks project.total_tasks 100 %}%"></div>
+                                        </div>
+                                        <span class="progress-mini-text">{{ project.completed_tasks }}/{{ project.total_tasks }}</span>
+                                    </div>
+                                    {% endif %}
+
+                                    <!-- Последние 2 задачи проекта -->
+                                    <div class="project-mini-tasks">
+                                        <div class="project-mini-tasks-header">
+                                            <i class="fas fa-clock"></i>
+                                            <span>Последние задачи:</span>
+                                        </div>
+                                        <div class="project-mini-tasks-list">
+                                            {% with project_tasks=project.project_tasks.all|slice:":2" %}
+                                                {% for task in project_tasks %}
+                                                <a href="{% url 'tasks:task_detail' task.id %}" class="project-mini-task">
+                                                    <span class="task-priority priority-{{ task.priority }}"></span>
+                                                    <span class="task-title">{{ task.title|truncatechars:25 }}</span>
+                                                    <span class="task-deadline">{{ task.deadline|date:"d.m" }}</span>
+                                                </a>
+                                                {% empty %}
+                                                <div class="project-mini-task empty">
+                                                    <i class="fas fa-info-circle"></i>
+                                                    Нет задач в проекте
+                                                </div>
+                                                {% endfor %}
+                                            {% endwith %}
+                                        </div>
+                                    </div>
+
+                                    <div class="project-mini-footer">
+                                        <a href="{% url 'projects:detail' project.id %}" class="project-mini-link">
+                                            <i class="fas fa-arrow-right"></i>
+                                            Перейти к проекту
+                                        </a>
+                                        <a href="{% url 'tasks:create_task' %}?project={{ project.id }}" class="project-mini-add-task" title="Добавить задачу в проект">
+                                            <i class="fas fa-plus"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <div class="empty-projects">
+                                    <i class="fas fa-folder-open"></i>
+                                    <p>У вас пока нет активных проектов</p>
+                                    <a href="{% url 'projects:create' %}" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-plus"></i> Создать проект
+                                    </a>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+<!-- Priority Board -->
+<div class="priority-board">
+    <div class="board-header">
+        <h2 class="board-title">
+            <i class="fas fa-columns"></i> Задачи по приоритетам
+        </h2>
+        <div class="view-options">
+            <button class="btn btn-primary" id="addMultipleBtn">
+                <i class="fas fa-layer-group"></i> Несколько задач
+            </button>
+        </div>
+    </div>
+
+    <div class="priority-columns">
+        <!-- Срочные задачи -->
+        <div class="priority-column">
+            <div class="column-header">
+                <div class="column-title">
+                    <span class="priority-badge">🔴</span>
+                    <span>Срочные</span>
+                    <span class="column-count">{{ urgent_tasks|length }}</span>
+                </div>
+                <button class="add-task-btn" data-priority="urgent">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+            <div class="column-content">
+                {% for task in urgent_tasks %}
+                {% if not task.is_completed %}
+                <div class="task-item urgent" onclick="location.href='{% url 'tasks:task_detail' task.pk %}'" style="cursor: pointer;">
+                    <div class="item-header">
+                        <div class="item-title">
+                            <a href="{% url 'tasks:task_detail' task.pk %}" onclick="event.stopPropagation()">{{ task.title }}</a>
+                            <h5 style="font-weight: 300; margin-top: 10px;">{{ task.description|truncatechars:50 }}</h5>
+                        </div>
+                        <div class="item-actions" onclick="event.stopPropagation()">
+                            <form method="post" action="{% url 'tasks:complete_task' task.pk %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success" style="padding:6px 8px; font-size:12px; margin-right:6px;">✓</button>
+                            </form>
+
+                            <!-- Начать/Приостановить - новые кнопки -->
+                            {% if task.status == 'pending' %}
+                            <form method="post" action="{% url 'tasks:start_task' task.pk %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary" style="padding:6px 8px; font-size:12px; margin-right:6px;">▶</button>
+                            </form>
+                            {% elif task.status == 'in_progress' %}
+                            <form method="post" action="{% url 'tasks:pause_task' task.pk %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-warning" style="padding:6px 8px; font-size:12px; margin-right:6px;">⏸</button>
+                            </form>
+                            {% endif %}
+
+
+                            <form method="post" action="{% url 'tasks:delete_task' task.pk %}" style="display:inline;" onsubmit="return confirm('Удалить задачу?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger" style="padding:6px 8px; font-size:12px;">X</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="item-meta">
+                        <span class="meta-item">
+                            <i class="fas fa-clock"></i>
+                            {{ task.deadline|date:"d.m.Y H:i" }}
+                        </span>
+                        {% if task.status == 'in_progress' %}
+                        <span class="meta-item status-badge status-in-progress">
+                            <i class="fas fa-play-circle"></i> В работе
+                        </span>
+                        {% elif task.status == 'completed' %}
+                        <span class="meta-item status-badge status-completed">
+                            <i class="fas fa-check-circle"></i> Выполнено
+                        </span>
+                        {% else %}
+                        <span class="meta-item status-badge status-pending">
+                            <i class="fas fa-hourglass-half"></i> Ожидает
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+                {% empty %}
+                <p style="text-align: center; color: #999; padding: 20px;">Нет задач</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Средние задачи -->
+        <div class="priority-column">
+            <div class="column-header">
+                <div class="column-title">
+                    <span class="priority-badge">🟡</span>
+                    <span>Средние</span>
+                    <span class="column-count">{{ medium_tasks|length }}</span>
+                </div>
+                <button class="add-task-btn" data-priority="average">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+            <div class="column-content">
+                {% for task in medium_tasks %}
+                {% if not task.is_completed %}
+                <div class="task-item medium" onclick="location.href='{% url 'tasks:task_detail' task.pk %}'" style="cursor: pointer;">
+                    <div class="item-header">
+                        <div class="item-title">
+                            <a href="{% url 'tasks:task_detail' task.pk %}" onclick="event.stopPropagation()">{{ task.title }}</a>
+                            <h5 style="font-weight: 300; margin-top: 10px;">{{ task.description|truncatechars:50 }}</h5>
+                        </div>
+                        <div class="item-actions" onclick="event.stopPropagation()">
+                            <!-- Выполнить -->
+                            <form method="post" action="{% url 'tasks:complete_task' task.pk %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success" style="padding:6px 8px; font-size:12px; margin-right:6px;">✓</button>
+                            </form>
+
+                            <!-- Начать/Приостановить -->
+                            {% if task.status == 'pending' %}
+                            <form method="post" action="{% url 'tasks:start_task' task.pk %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary" style="padding:6px 8px; font-size:12px; margin-right:6px;">▶</button>
+                            </form>
+                            {% elif task.status == 'in_progress' %}
+                            <form method="post" action="{% url 'tasks:pause_task' task.pk %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-warning" style="padding:6px 8px; font-size:12px; margin-right:6px;">⏸</button>
+                            </form>
+                            {% endif %}
+
+                            <!-- Удалить -->
+                            <form method="post" action="{% url 'tasks:delete_task' task.pk %}" style="display:inline;" onsubmit="return confirm('Удалить задачу?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger" style="padding:6px 8px; font-size:12px;">X</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="item-meta">
+                        <span class="meta-item">
+                            <i class="fas fa-clock"></i>
+                            {{ task.deadline|date:"d.m.Y H:i" }}
+                        </span>
+                        {% if task.status == 'in_progress' %}
+                        <span class="meta-item status-badge status-in-progress">
+                            <i class="fas fa-play-circle"></i> В работе
+                        </span>
+                        {% elif task.status == 'completed' %}
+                        <span class="meta-item status-badge status-completed">
+                            <i class="fas fa-check-circle"></i> Выполнено
+                        </span>
+                        {% else %}
+                        <span class="meta-item status-badge status-pending">
+                            <i class="fas fa-hourglass-half"></i> Ожидает
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+                {% empty %}
+                <p style="text-align: center; color: #999; padding: 20px;">Нет задач</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Обычные задачи -->
+        <div class="priority-column">
+            <div class="column-header">
+                <div class="column-title">
+                    <span class="priority-badge" style="color: #86c5fc;">⚪</span>
+                    <span>Обычные</span>
+                    <span class="column-count">{{ low_tasks|length }}</span>
+                </div>
+                <button class="add-task-btn" data-priority="ordinary">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+            <div class="column-content">
+                {% for task in low_tasks %}
+                {% if not task.is_completed %}
+                <div class="task-item low" onclick="location.href='{% url 'tasks:task_detail' task.pk %}'" style="cursor: pointer;">
+                    <div class="item-header">
+                        <div class="item-title">
+                            <a href="{% url 'tasks:task_detail' task.pk %}" onclick="event.stopPropagation()">{{ task.title }}</a>
+                            <h5 style="font-weight: 300; margin-top: 10px;">{{ task.description|truncatechars:50 }}</h5>
+                        </div>
+                        <div class="item-actions" onclick="event.stopPropagation()">
+                            <!-- Выполнить -->
+                            <form method="post" action="{% url 'tasks:complete_task' task.pk %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success" style="padding:6px 8px; font-size:12px; margin-right:6px;">✓</button>
+                            </form>
+
+                            <!-- Начать/Приостановить -->
+                            {% if task.status == 'pending' %}
+                            <form method="post" action="{% url 'tasks:start_task' task.pk %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary" style="padding:6px 8px; font-size:12px; margin-right:6px;">▶</button>
+                            </form>
+                            {% elif task.status == 'in_progress' %}
+                            <form method="post" action="{% url 'tasks:pause_task' task.pk %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-warning" style="padding:6px 8px; font-size:12px; margin-right:6px;">⏸</button>
+                            </form>
+                            {% endif %}
+
+
+                            <!-- Удалить -->
+                            <form method="post" action="{% url 'tasks:delete_task' task.pk %}" style="display:inline;" onsubmit="return confirm('Удалить задачу?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger" style="padding:6px 8px; font-size:12px;">X</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="item-meta">
+                        <span class="meta-item">
+                            <i class="fas fa-clock"></i>
+                            {{ task.deadline|date:"d.m.Y H:i" }}
+                        </span>
+                        {% if task.status == 'in_progress' %}
+                        <span class="meta-item status-badge status-in-progress">
+                            <i class="fas fa-play-circle"></i> В работе
+                        </span>
+                        {% elif task.status == 'completed' %}
+                        <span class="meta-item status-badge status-completed">
+                            <i class="fas fa-check-circle"></i> Выполнено
+                        </span>
+                        {% else %}
+                        <span class="meta-item status-badge status-pending">
+                            <i class="fas fa-hourglass-half"></i> Ожидает
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+                {% empty %}
+                <p style="text-align: center; color: #999; padding: 20px;">Нет задач</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+<div>
+
+
+
+                        <!-- Выбор проекта (выпадающий список) -->
+                        <div class="project-selector">
+                            <h3 class="projects-subtitle">
+                                <i class="fas fa-arrow-down" style="color: #4dabf7;"></i>
+                                Выбрать другой проект
+                            </h3>
+                            <div class="selector-wrapper">
+                                <select class="project-select" id="projectSelect" onchange="location.href=this.value;">
+                                    <option value="" selected disabled>— Выберите проект —</option>
+                                    {% for project in all_projects %}
+                                    <option value="{% url 'tasks:project_planner' project.id %}">
+                                        {{ project.name }} ({{ project.project_tasks.count }} задач, владелец: {{ project.owner.username }})
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                <i class="fas fa-chevron-down select-arrow"></i>
+                            </div>
+                            <a href="{% url 'projects:list' %}" class="view-all-projects">
+                                <i class="fas fa-grid-2"></i>
+                                Все проекты
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <!-- Нижний блок с календарем и статистикой -->
+                <div class="bottom-stats-grid">
+                    <!-- Левая колонка - Календарь -->
+                    <div class="stats-card calendar-card">
+                        <div class="stats-card-header">
+                            <div class="stats-card-title">
+                                <i class="fas fa-calendar-alt" style="color: #4dabf7;"></i>
+                                <h3>Календарь задач</h3>
+                            </div>
+                            <div class="calendar-nav">
+                                <button class="calendar-nav-btn" onclick="prevMonth()">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <span class="current-month" id="currentMonth">{{ current_month }}</span>
+                                <button class="calendar-nav-btn" onclick="nextMonth()">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Дни недели -->
+                        <div class="calendar-weekdays">
+                            <div>Пн</div>
+                            <div>Вт</div>
+                            <div>Ср</div>
+                            <div>Чт</div>
+                            <div>Пт</div>
+                            <div>Сб</div>
+                            <div>Вс</div>
+                        </div>
+
+                        <!-- Календарная сетка -->
+                        <div class="calendar-grid" id="calendarGrid">
+                            {% for day in calendar_days %}
+                            <div class="calendar-day {% if day.has_tasks %}has-tasks{% endif %} {% if day.is_today %}today{% endif %}"
+                                 data-date="{{ day.date|date:'Y-m-d' }}"
+                                 onclick="showDayTasks('{{ day.date|date:'Y-m-d' }}')">
+                                <span class="day-number">{{ day.day }}</span>
+                                {% if day.has_tasks %}
+                                <div class="task-dots">
+                                    <span class="dot urgent-dot" title="Есть срочные задачи"></span>
+                                    {% if day.tasks_count > 1 %}
+                                    <span class="tasks-count">+{{ day.tasks_count|add:"-1" }}</span>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Легенда календаря -->
+                        <div class="calendar-legend">
+                            <div class="legend-item">
+                                <span class="legend-dot today-dot"></span>
+                                <span>Сегодня</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-dot has-tasks-dot"></span>
+                                <span>Есть задачи</span>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="priority-columns">
-                        <!-- Срочные задачи -->
-                        <div class="priority-column">
-                            <div class="column-header">
-                                <div class="column-title">
-                                    <span class="priority-badge">🔴</span>
-                                    <span>Срочные</span>
-                                    <span class="column-count">{{ urgent_tasks|length }}</span>
-                                </div>
-                                <button class="add-task-btn" data-priority="urgent">
-                                    <i class="fas fa-plus"></i>
-                                </button>
+                    <!-- Правая колонка - Круговая диаграмма статистики -->
+                    <div class="stats-card chart-card">
+                        <div class="stats-card-header">
+                            <div class="stats-card-title">
+                                <i class="fas fa-chart-pie" style="color: #4dabf7;"></i>
+                                <h3>Статистика задач</h3>
                             </div>
-                            <div class="column-content">
-                                {% for task in urgent_tasks %}
-                                <div class="task-item urgent">
-                                    <div class="item-header">
-                                        <div class="item-title">
-                                            <a href="{% url 'tasks:task_detail' task.pk %}">{{ task.title }}</a>
-                                        </div>
-                                        <div class="item-actions">
-                                            <form method="post" action="{% url 'tasks:complete_task' task.pk %}" style="display:inline;">
-                                                {% csrf_token %}
-                                                <button type="submit" class="btn btn-success" style="padding:6px 8px; font-size:12px; margin-right:6px;">✓</button>
-                                            </form>
-                                            <a href="{% url 'tasks:edit_task' task.pk %}" class="btn btn-secondary" style="padding:6px 8px; font-size:12px; margin-right:6px;">✎</a>
-
-                                            <form method="post" action="{% url 'tasks:delete_task' task.pk %}" style="display:inline;" onsubmit="return confirm('Удалить задачу?');">
-                                                {% csrf_token %}
-                                                <button type="submit" class="btn btn-danger" style="padding:6px 8px; font-size:12px;">X</button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                    <div class="item-meta">
-                                        <span class="meta-item">
-                                            <i class="fas fa-clock"></i>
-                                            {{ task.deadline|date:"d.m.Y H:i" }}
-                                        </span>
-                                    </div>
-                                </div>
-                                {% empty %}
-                                <p style="text-align: center; color: #999; padding: 20px;">Нет задач</p>
-                                {% endfor %}
+                            <div class="chart-period-selector">
+                                <select class="period-select" onchange="updateChart(this.value)">
+                                    <option value="week">За неделю</option>
+                                    <option value="month" selected>За месяц</option>
+                                    <option value="year">За год</option>
+                                </select>
                             </div>
                         </div>
 
-                        <!-- Средние задачи -->
-                        <div class="priority-column">
-                            <div class="column-header">
-                                <div class="column-title">
-                                    <span class="priority-badge">🟡</span>
-                                    <span>Средние</span>
-                                    <span class="column-count">{{ medium_tasks|length }}</span>
-                                </div>
-                                <button class="add-task-btn" data-priority="average">
-                                    <i class="fas fa-plus"></i>
-                                </button>
+                        <!-- Круговая диаграмма -->
+                        <div class="chart-container">
+                            <div class="pie-chart" id="pieChart">
+                                <!-- SVG круг будет вставлен через JS -->
                             </div>
-                            <div class="column-content">
-                                {% for task in medium_tasks %}
-                                <div class="task-item medium">
-                                    <div class="item-header">
-                                        <div class="item-title">
-                                            <a href="{% url 'tasks:task_detail' task.pk %}">{{ task.title }}</a>
-                                        </div>
-                                        <div class="item-actions">
-                                            <form method="post" action="{% url 'tasks:complete_task' task.pk %}" style="display:inline;">
-                                                {% csrf_token %}
-                                                <button type="submit" class="btn btn-success" style="padding:6px 8px; font-size:12px; margin-right:6px;">✓</button>
-                                            </form>
-                                            <a href="{% url 'tasks:edit_task' task.pk %}" class="btn btn-secondary" style="padding:6px 8px; font-size:12px; margin-right:6px;">✎</a>
 
-                                            <form method="post" action="{% url 'tasks:delete_task' task.pk %}" style="display:inline;" onsubmit="return confirm('Удалить задачу?');">
-                                                {% csrf_token %}
-                                                <button type="submit" class="btn btn-danger" style="padding:6px 8px; font-size:12px;">X</button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                    <div class="item-meta">
-                                        <span class="meta-item">
-                                            <i class="fas fa-clock"></i>
-                                            {{ task.deadline|date:"d.m.Y H:i" }}
-                                        </span>
-                                    </div>
-                                </div>
-                                {% empty %}
-                                <p style="text-align: center; color: #999; padding: 20px;">Нет задач</p>
-                                {% endfor %}
+                            <!-- Статистика в центре -->
+                            <div class="chart-center-stats">
+                                <div class="total-tasks">{{ total_tasks }}</div>
+                                <div class="total-label">всего задач</div>
                             </div>
                         </div>
 
-                        <!-- Обычные задачи -->
-                        <div class="priority-column">
-                            <div class="column-header">
-                                <div class="column-title">
-                                    <span class="priority-badge">⚪</span>
-                                    <span>Обычные</span>
-                                    <span class="column-count">{{ low_tasks|length }}</span>
-                                </div>
-                                <button class="add-task-btn" data-priority="ordinary">
-                                    <i class="fas fa-plus"></i>
-                                </button>
+                        <!-- Легенда диаграммы -->
+                        <div class="chart-legend">
+                            <div class="legend-row">
+                                <div class="legend-color" style="background: #28a745;"></div>
+                                <span class="legend-label">Выполнено</span>
+                                <span class="legend-value" id="completedCount">{{ stats.completed }}</span>
+                                <span class="legend-percent" id="completedPercent">{{ completed_percent }}%</span>
                             </div>
-                            <div class="column-content">
-                                {% for task in low_tasks %}
-                                <div class="task-item low">
-                                    <div class="item-header">
-                                        <div class="item-title">
-                                            <a href="{% url 'tasks:task_detail' task.pk %}">{{ task.title }}</a>
-                                        </div>
-                                        <div class="item-actions">
-                                            <form method="post" action="{% url 'tasks:complete_task' task.pk %}" style="display:inline;">
-                                                {% csrf_token %}
-                                                <button type="submit" class="btn btn-success" style="padding:6px 8px; font-size:12px; margin-right:6px;">✓</button>
-                                            </form>
-                                            <a href="{% url 'tasks:edit_task' task.pk %}" class="btn btn-secondary" style="padding:6px 8px; font-size:12px; margin-right:6px;">✎</a>
+                            <div class="legend-row">
+                                <div class="legend-color" style="background: #dc3545;"></div>
+                                <span class="legend-label">Просрочено</span>
+                                <span class="legend-value" id="overdueCount">{{ stats.overdue }}</span>
+                                <span class="legend-percent" id="overduePercent">{{ overdue_percent }}%</span>
+                            </div>
+                            <div class="legend-row">
+                                <div class="legend-color" style="background: #ffc107;"></div>
+                                <span class="legend-label">В ожидании</span>
+                                <span class="legend-value" id="pendingCount">{{ stats.pending }}</span>
+                                <span class="legend-percent" id="pendingPercent">{{ pending_percent }}%</span>
+                            </div>
+                        </div>
 
-                                            <form method="post" action="{% url 'tasks:delete_task' task.pk %}" style="display:inline;" onsubmit="return confirm('Удалить задачу?');">
-                                                {% csrf_token %}
-                                                <button type="submit" class="btn btn-danger" style="padding:6px 8px; font-size:12px;">X</button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                    <div class="item-meta">
-                                        <span class="meta-item">
-                                            <i class="fas fa-clock"></i>
-                                            {{ task.deadline|date:"d.m.Y H:i" }}
-                                        </span>
-                                    </div>
+                        <!-- Детальная статистика -->
+                        <div class="detailed-stats">
+                            <div class="stat-item">
+                                <i class="fas fa-clock" style="color: #4dabf7;"></i>
+                                <div class="stat-info">
+                                    <span class="stat-label">Среднее время выполнения</span>
+                                    <span class="stat-value">{{ avg_completion_time }}</span>
                                 </div>
-                                {% empty %}
-                                <p style="text-align: center; color: #999; padding: 20px;">Нет задач</p>
-                                {% endfor %}
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-trending-up" style="color: #28a745;"></i>
+                                <div class="stat-info">
+                                    <span class="stat-label">Продуктивность</span>
+                                    <span class="stat-value">{{ productivity }}%</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div>
 
-                <div class="priority-columns">
-                    <div class="task-item low">
-                        <h1>Календарь</h1>
-                    </div>
-                    <div class="task-item low">
-                        <h1>Статистика</h1>
+                <!-- Модальное окно с задачами на выбранный день -->
+                <div class="modal-overlay" id="dayTasksModal">
+                    <div class="modal-dialog" style="max-width: 400px;">
+                        <div class="modal-header">
+                            <h3 class="modal-title">
+                                <i class="fas fa-tasks"></i>
+                                Задачи на <span id="selectedDate"></span>
+                            </h3>
+                            <button class="modal-close" onclick="closeDayTasksModal()">&times;</button>
+                        </div>
+                        <div class="modal-body" id="dayTasksList">
+                            <!-- Задачи будут загружены сюда -->
+                        </div>
                     </div>
                 </div>
+
 
             </div>
             </div>

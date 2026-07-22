@@ -27,7 +27,7 @@ def register_view(request):
 
                 login(request, user)
                 messages.success(request, f'Регистрация успешна! Добро пожаловать, {user.username}')
-                return redirect('home')
+                return redirect('tasks:planner')
 
             except IntegrityError:
                 messages.error(request, "Пользователь с такими данными уже существует")

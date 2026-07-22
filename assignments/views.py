@@ -9,7 +9,6 @@ from comments.models import Comment
 
 @login_required
 def start_task(request, assignment_id):
-    """Начать работу над задачей"""
     assignment = get_object_or_404(TaskAssignment, id=assignment_id, user=request.user)
     
     if request.method == 'POST':
@@ -48,7 +47,6 @@ def complete_task(request, assignment_id):
 
 @login_required
 def reject_task(request, assignment_id):
-    """Вернуть задачу на доработку (для проверяющего)"""
     assignment = get_object_or_404(TaskAssignment, id=assignment_id)
     
     if request.method == 'POST':
@@ -68,7 +66,6 @@ def reject_task(request, assignment_id):
 
 @login_required
 def assign_task(request, task_id):
-    """Назначить задачу пользователю"""
     from tasks.models import Task
     task = get_object_or_404(Task, pk=task_id, user=request.user)
     
@@ -107,7 +104,6 @@ def assign_task(request, task_id):
 
 @login_required
 def cancel_assignment(request, assignment_id):
-    """Отменить назначение задачи"""
     assignment = get_object_or_404(TaskAssignment, id=assignment_id)
     
     if request.method == 'POST':

@@ -1,12 +1,7 @@
 {% extends 'base.html' %}
 {% block title %}Smart-Planner - Умный планировщик задач{% endblock %}
 {% block extra_css %}
-<style>
-    /* Стили для скролла к якорям */
-    html {
-        scroll-behavior: smooth;
-    }
-</style>
+
 {% endblock %}
 {% block content %}
 <!-- Hero Section -->
@@ -26,7 +21,8 @@
                 </div>
             </div>
             <div class="hero-image">
-                <img src="https://images.unsplash.com/photo-1611224923853-80b023f02d71?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Планировщик задач" class="hero-img">
+                {% load static %}
+                <img src="{% static 'images/to_du.png' %}" alt="Планировщик задач" class="hero-img">
             </div>
         </div>
     </div>

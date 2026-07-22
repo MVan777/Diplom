@@ -3,9 +3,7 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 
-
 class Task(models.Model):
-
     # Приоритеты
     ORDINARY = 'ordinary'
     AVERAGE = 'average'
@@ -15,6 +13,16 @@ class Task(models.Model):
         (ORDINARY, 'Обычный'),
         (AVERAGE, 'Средний'),
         (URGENT, 'Срочный'),
+    ]
+
+    IN_PROGRESS = 'in_progress'
+    COMPLETED = 'completed'
+    PENDING = 'pending'
+
+    STATUS_CHOICES = [
+        (PENDING, 'В ожидании'),
+        (IN_PROGRESS, 'В работе'),
+        (COMPLETED, 'Выполнено'),
     ]
 
     # Основные поля
@@ -33,6 +41,8 @@ class Task(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создано')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Обновлено')
     deadline_end = models.DateTimeField(null=True, blank=True, verbose_name='Конец задачи')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=PENDING, verbose_name='Статус')
+    started_at = models.DateTimeField(null=True, blank=True, verbose_name='Начало работы')
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tasks',
                              verbose_name='Пользователь')
@@ -73,12 +83,34 @@ class Task(models.Model):
             raise ValidationError({'deadline_end': 'Конец задачи должен быть позже дедлайна'})
 
     def save(self, *args, **kwargs):
-
+        # Для обратной совместимости с is_completed
         if self.is_completed and not self.completed_at:
             self.completed_at = timezone.now()
-        elif not self.is_completed:
+            self.status = self.COMPLETED
+        elif not self.is_completed and self.status == self.COMPLETED:
+            self.status = self.PENDING
             self.completed_at = None
 
-        self.full_clean()
+        # Обновляем completed_at и is_completed на основе статуса
+        if self.status == self.COMPLETED:
+            if not self.completed_at:
+                self.completed_at = timezone.now()
+            self.is_completed = True
+        else:
+            self.completed_at = None
+            self.is_completed = False
 
+        # Устанавливаем started_at при начале работы
+        if self.status == self.IN_PROGRESS and not self.started_at:
+            self.started_at = timezone.now()
+
+        self.full_clean()
         super().save(*args, **kwargs)
+
+    @property
+    def status_label(self):
+        return dict(self.STATUS_CHOICES).get(self.status, 'Неизвестно')
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('tasks:task_detail', kwargs={'pk': self.pk})

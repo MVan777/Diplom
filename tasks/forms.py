@@ -52,7 +52,6 @@ class TaskForm(forms.ModelForm):
         now_str = now_local.strftime('%Y-%m-%dT%H:%M')
         self.fields['deadline'].widget.attrs['min'] = now_str
 
-        # 👇 ФИЛЬТРУЕМ ПРОЕКТЫ ТОЛЬКО ЕСЛИ user существует
         if self.user and not self.user.is_anonymous:
             from django.db.models import Q
             self.fields['project'].queryset = Project.objects.filter(
